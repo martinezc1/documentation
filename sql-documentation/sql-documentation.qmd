@@ -202,15 +202,11 @@ We can use **SQL** to store, retrieve, filter, summarize, and combine data, whil
 ### TL;DR {#sec-sql-tldr}
 
 1.  **Database:** Where our organized data lives.
-
 2.  **Table:** A dataset inside the database, similar to an R data frame.
-
 3.  **SQL:** The language we use to communicate with the database.
-
 4.  **SQLite:** The database system we will use in this guide.
-
 5.  **R:** The environment we will use to connect everything together.\
-    :::
+:::
 
 ## Packages {#sec-packages}
 
