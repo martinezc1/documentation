@@ -13,7 +13,7 @@ We will use:
 
 The general workflow is:
 
-```         
+```{mermaid}
 flowchart LR
     A[Excel] --> B[R]
     B --> C[SQLite Database]
@@ -393,16 +393,16 @@ The final Quarto report communicates **what the analysis found**.
 
 The final report may include:
 
-- research question;
-- data sources;
-- methodology;
-- description of the articles;
-- text-processing methods;
-- text-analysis results;
-- visualizations;
-- interpretation;
-- limitations; and
-- conclusions.
+- research question
+- data sources
+- methodology
+- description of the articles
+- text-processing methods
+- text-analysis results
+- visualizations
+- interpretation
+- limitations
+- conclusions
 
 ## Final Checklist {#sec-text-project-final-checklist}
 
@@ -421,7 +421,7 @@ By the end of the project, you should be able to:
 
 ## Final Workflow {#sec-text-project-final-workflow}
 
-```         
+```{mermaid}
 flowchart TD
     A[Excel Article List] --> B[Import into R]
     B --> C[Create SQLite Database]

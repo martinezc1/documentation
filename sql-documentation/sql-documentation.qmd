@@ -332,11 +332,9 @@ DBI::dbListTables(con)
 
 For example, imagine our database contains:
 
-```         
-students
-courses
-enrollment
-```
+- students
+- courses
+- enrollment
 
 Each of these represents a separate **table** within the same database.
 
@@ -796,14 +794,11 @@ ggplot(
 
 This illustrates an important workflow:
 
-```         
-SQL Database
-      ↓
-SQL Query
-      ↓
-R Data Frame
-      ↓
-Analysis / Visualization / Modeling
+```{mermaid}
+flowchart TD
+    A[SQL Database] --> B[SQL Query]
+    B --> C[R Data Frame]
+    C --> D[Analysis / Visualization / Modeling]
 ```
 
 SQL does not replace R.
@@ -893,25 +888,11 @@ This introduces an important distinction.
 
 For example:
 
-```         
-CREATE TABLE
-```
-
-```         
-DROP TABLE
-```
-
-```         
-INSERT INTO
-```
-
-```         
-UPDATE
-```
-
-```         
-DELETE
-```
+- `CREATE TABLE`
+- `DROP TABLE`
+- `INSERT INTO`
+- `UPDATE`
+- `DELETE`
 
 are operations that modify the database.
 
