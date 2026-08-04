@@ -349,13 +349,13 @@ Use R to conduct the main text analysis.
 
 Possible analyses include:
 
-- word frequencies;
-- lexicon analysis;
-- sentiment analysis;
-- bigrams or n-grams;
-- comparisons between sources;
-- comparisons across time; and
-- other text-mining methods relevant to the research question.
+- word frequencies
+- lexicon analysis
+- sentiment analysis
+- bigrams or n-grams
+- comparisons between sources
+- comparisons across time
+- other text-mining methods relevant to the research question
 
 ### Retrieve the Data {#sec-text-project-conduct-analysis-retrieve-the-data}
 
@@ -450,14 +450,14 @@ The goal is not only to complete this analysis, but to understand the workflow w
 
 ## Checklist {#sec-text-project-checklist}
 
-## Data Preparation {#sec-text-project-checklist-data-preparation}
+### Data Preparation {#sec-text-project-checklist-data-preparation}
 
 - [ ] Imported the original Excel file into R.
 - [ ] Confirmed that one row represents one article.
 - [ ] Checked for missing or duplicate URLs.
 - [ ] Created a unique `article_id`.
 
-## SQLite Database {#sec-text-project-checklist-sqlite-database}
+### SQLite Database {#sec-text-project-checklist-sqlite-database}
 
 - [ ] Connected R to SQLite.
 - [ ] Created the SQLite database.
@@ -465,7 +465,7 @@ The goal is not only to complete this analysis, but to understand the workflow w
 - [ ] Confirmed that the database contains the expected number of records.
 - [ ] Retrieved data from SQLite into R.
 
-## Article Text {#sec-text-project-checklist-article-text}
+### Article Text {#sec-text-project-checklist-article-text}
 
 - [ ] Tested article-text extraction using one URL.
 - [ ] Extracted text from all possible articles.
@@ -473,7 +473,7 @@ The goal is not only to complete this analysis, but to understand the workflow w
 - [ ] Created an `article_text` variable.
 - [ ] Updated the SQLite database with the extracted text.
 
-## SQL Practice {#sec-text-project-checklist-sql-practice}
+### SQL Practice {#sec-text-project-checklist-sql-practice}
 
 - [ ] Used `SELECT` to retrieve data.
 - [ ] Used `WHERE` to filter records.
@@ -482,7 +482,7 @@ The goal is not only to complete this analysis, but to understand the workflow w
 - [ ] Used `ORDER BY` to sort query results.
 - [ ] Used `UPDATE` or another database-writing method to update stored data.
 
-## Text Analysis {#sec-text-project-checklist-text-analysis}
+### Text Analysis {#sec-text-project-checklist-text-analysis}
 
 - [ ] Retrieved the necessary data from SQLite.
 - [ ] Cleaned and tokenized the article text.
@@ -490,7 +490,7 @@ The goal is not only to complete this analysis, but to understand the workflow w
 - [ ] Created appropriate visualizations.
 - [ ] Documented the main findings.
 
-## Final Output {#sec-text-project-checklist-final-output}
+### Final Output {#sec-text-project-checklist-final-output}
 
 - [ ] Produced a reproducible Quarto report.
 - [ ] Documented important problems and decisions.
@@ -498,7 +498,7 @@ The goal is not only to complete this analysis, but to understand the workflow w
 
 ## Key Functions and Commands {#sec-text-project-key-functions}
 
-## Excel and Data Import {#sec-text-project-key-functions-excel-and-data-import}
+### Excel and Data Import {#sec-text-project-key-functions-excel-and-data-import}
 
 | Function       | Purpose                            |
 |----------------|------------------------------------|
@@ -519,7 +519,7 @@ The goal is not only to complete this analysis, but to understand the workflow w
 | `dbDisconnect()` | Close the database connection          |
 | `dbListTables()` | List the tables stored in the database |
 
-## Reading and Writing Database Data {#sec-text-project-key-functions-reading-and-writing-database-data}
+### Reading and Writing Database Data {#sec-text-project-key-functions-reading-and-writing-database-data}
 
 |                  |                                                   |
 |------------------|---------------------------------------------------|
@@ -529,7 +529,7 @@ The goal is not only to complete this analysis, but to understand the workflow w
 | `dbGetQuery()`   | Send a SQL query to SQLite and return the results |
 | `dbExecute()`    | Send a SQL command that changes the database      |
 
-## Basic SQL Commands {#sec-text-project-key-functions-basic-sql-commands}
+### Basic SQL Commands {#sec-text-project-key-functions-basic-sql-commands}
 
 |            |                                      |
 |------------|--------------------------------------|
@@ -543,7 +543,7 @@ The goal is not only to complete this analysis, but to understand the workflow w
 | `UPDATE`   | Change existing records              |
 | `IS NULL`  | Identify missing database values     |
 
-## Web Scraping {#sec-text-project-key-functions-web-scraping}
+### Web Scraping {#sec-text-project-key-functions-web-scraping}
 
 |                   |                                          |
 |-------------------|------------------------------------------|
@@ -552,7 +552,7 @@ The goal is not only to complete this analysis, but to understand the workflow w
 | `html_elements()` | Select elements from a webpage           |
 | `html_text2()`    | Extract text from selected HTML elements |
 
-## Text Analysis {#sec-text-project-key-functions-text-analysis}
+### Text Analysis {#sec-text-project-key-functions-text-analysis}
 
 |                    |                                             |
 |--------------------|---------------------------------------------|
