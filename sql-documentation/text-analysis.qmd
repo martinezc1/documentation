@@ -1,0 +1,565 @@
+# Text Analysis Project {#sec-text-project}
+
+## Project Overview {#sec-text-project-overview}
+
+The goal of this project is to build a reproducible workflow for collecting, storing, and analyzing text from online articles.
+
+We will use:
+
+- *Excel*: as the original source of the article list.
+- *R*: to import, clean, scrape, and analyze the data.
+- *SQLite*: to store and organize the data.
+- *Quarto*: to document and present the final analysis.
+
+The general workflow is:
+
+```         
+flowchart LR
+    A[Excel] --> B[R]
+    B --> C[SQLite Database]
+    C --> D[R: Extract Text]
+    D --> E[SQLite Database]
+    E --> F[R: Text Analysis]
+    F --> G[Quarto Report]
+```
+
+The goal is to create a workflow that can be reused for future text-analysis projects.
+
+Before getting started, please review @sec-databases-sql-r for an introduction to databases, SQL, SQLite, and working with SQL in R.
+
+## Import the Excel File {#sec-text-project-import-excel}
+
+### Goal {#sec-text-project-import-excel-goal}
+
+Load the existing Excel file into R and prepare it for the database.
+
+The original Excel file should remain unchanged.
+
+### Tasks {#sec-text-project-import-excel-tasks}
+
+- [ ] Load the required R packages.
+- [ ] Import the Excel file.
+- [ ] Inspect the data.
+- [ ] Check for missing URLs.
+- [ ] Check for duplicate articles.
+- [ ] Create a unique `article_id`.
+
+### Working Code {#sec-text-project-import-excel-working-code}
+
+```         
+# Add code here
+```
+
+### Checkpoint {#sec-text-project-import-excel-checkpoint}
+
+You should now have:
+
+- one row per article;
+- a unique `article_id`;
+- a URL for each article; and
+- an R data frame ready to be stored in SQLite.
+
+### Notes {#sec-text-project-import-excel-notes}
+
+> Add notes here.
+
+## Create the SQLite Database {#sec-text-project-create-sqlite}
+
+For guidance, see @sec-database-from-excel.
+
+### Goal {#sec-text-project-create-sqlite-goal}
+
+Create a SQLite database and connect to it using R.
+
+We will use the `DBI` and `RSQLite` packages to work with SQLite from R.
+
+The database can be called:
+
+```         
+text_analysis.db
+```
+
+The first table will be:
+
+```         
+articles
+```
+
+One row in `articles` should represent **one article**.
+
+### Tasks {#sec-text-project-create-sqlite-tasks}
+
+- [ ] Load `DBI`.
+- [ ] Load `RSQLite`.
+- [ ] Create/connect to `text_analysis.db`.
+- [ ] Add the article data to the database.
+- [ ] Confirm that the `articles` table was created.
+
+### Working Code {#sec-text-project-create-sqlite-working-code}
+
+```         
+# Add code here
+```
+
+### Checkpoint {#sec-text-project-create-sqlite-checkpoint}
+
+You should now have a SQLite database containing an `articles` table.
+
+### Notes {#sec-text-project-create-sqlite-notes}
+
+> Add notes here.
+
+## Read Data from SQLite {#sec-text-project-read-sqlite}
+
+For guidance, see @sec-exploring-database.
+
+### Goal {#sec-text-project-read-sqlite-goal}
+
+Practice retrieving information from the SQLite database using R.
+
+Instead of continuing to use the original Excel file, the database should now become the working source for the project.
+
+### Tasks {#sec-text-project-read-sqlite-tasks}
+
+- [ ] List the tables in the database.
+- [ ] Read the `articles` table into R.
+- [ ] Count the number of articles.
+- [ ] View several records.
+- [ ] Confirm that the data matches the original Excel file.
+
+### Working Code {#sec-text-project-read-sqlite-working-code}
+
+```         
+# Add code here
+```
+
+### SQL Skills {#sec-text-project-read-sqlite-sql-skills}
+
+This step is an opportunity to practice:
+
+- `SELECT`
+- `FROM`
+- `WHERE`
+- `COUNT()`
+
+These commands can be sent to SQLite directly from R using functions such as `dbGetQuery()`.
+
+### Notes {#sec-text-project-read-sqlite-notes}
+
+> Add notes here.
+
+## Extract the Article Text {#sec-text-project-extract-text}
+
+### Goal {#sec-text-project-extract-text-goal}
+
+Use the URLs stored in the database to retrieve the text from each article.
+
+This work will be completed in R.
+
+The final data should contain the original article information plus a new variable:
+
+```         
+article_text
+```
+
+### Tasks {#sec-text-project-extract-text-tasks}
+
+- [ ] Retrieve the article URLs from SQLite.
+- [ ] Test text extraction using one article.
+- [ ] Inspect the extracted text.
+- [ ] Create a reusable function for extracting article text.
+- [ ] Apply the function to all articles.
+- [ ] Identify articles that could not be extracted.
+- [ ] Create the `article_text` column.
+
+### Example Code {#sec-text-project-extract-text-example-code}
+
+Below is sample code to help with text extraction:
+
+```         
+library(rvest)
+
+url <- "https://example.com/news/article"
+
+page <- read_html(url)
+
+article_text <- page |>
+  html_elements("p") |>
+  html_text2() |>
+  paste(collapse = " ")
+
+article_text
+```
+
+::: callout-tip
+
+#### Writing Functions {#sec-text-project-extract-text-writing-functions}
+
+Instead of repeating this code for each article, create a function that takes a URL and returns the article text. This will allow the same process to be applied across all article URLs.\
+:::
+
+### Test One Article {#sec-text-project-extract-text-test-one-article}
+
+Before processing every article, make sure the process works with one URL.
+
+```         
+# Test code here
+```
+
+### Process All Articles {#sec-text-project-extract-text-process-all-articles}
+
+```         
+# Add code here
+```
+
+### Checkpoint {#sec-text-project-extract-text-checkpoint}
+
+You should now have an R data frame containing:
+
+- the original article information;
+
+- `article_id`;
+- `url`; and
+- `article_text`.
+
+### Notes {#sec-text-project-extract-text-notes}
+
+**Were any articles unable to be extracted?**
+
+> Add notes here.
+
+**Did the extracted text contain unwanted webpage content?**
+
+> Add notes here.
+
+## Update the SQLite Database {#sec-text-project-update-sqlite}
+
+For guidance on modifying a database from R, see @sec-creating-tables.
+
+### Goal {#sec-text-project-update-sqlite-goal}
+
+Save the extracted article text back into SQLite.
+
+The database should now contain both the original article information and the newly extracted text.
+
+### Tasks {#sec-text-project-update-sqlite-tasks}
+
+- [ ] Write the updated data to SQLite.
+- [ ] Confirm that `article_text` is stored.
+- [ ] Check for articles with missing text.
+- [ ] Confirm that the number of articles has not changed.
+
+### Working Code {#sec-text-project-update-sqlite-working-code}
+
+```         
+# Add code here
+```
+
+### SQL Skills {#sec-text-project-update-sqlite-sql-skills}
+
+This step is an opportunity to practice working with:
+
+- `UPDATE`
+- `WHERE`
+- `SELECT`
+
+### Checkpoint {#sec-text-project-update-sqlite-checkpoint}
+
+The `articles` table should now contain everything needed for the text analysis.
+
+### Notes {#sec-text-project-update-sqlite-notes}
+
+> Add notes here.
+
+## Prepare the Text for Analysis {#sec-text-project-prepare-text}
+
+### Goal {#sec-text-project-prepare-text-goal}
+
+Use R to transform the article text into a format that can be analyzed.
+
+Depending on the analysis, this may include:
+
+- converting text to lowercase;
+- removing punctuation;
+- tokenizing text;
+- removing stop words; and
+- creating word frequencies.
+
+### Tasks {#sec-text-project-prepare-text-tasks}
+
+- [ ] Load the article data from SQLite.
+- [ ] Tokenize the article text.
+- [ ] Clean the tokens as needed.
+- [ ] Preserve `article_id` so words can be connected to their original articles.
+- [ ] Prepare an analysis-ready dataset.
+
+### Working Code {#sec-text-project-prepare-text-working-code}
+
+```         
+# Add code here
+```
+
+### Notes {#sec-text-project-prepare-text-notes}
+
+> Add notes here.
+
+## Explore the Data with SQLite {#sec-text-project-explore-sqlite}
+
+For guidance, see @sec-writing-sql-r
+
+### Goal {#sec-text-project-explore-sqlite-goal}
+
+Use the database to practice basic SQL queries before completing the main analysis in R.
+
+Possible questions include:
+
+- How many articles are in the database?
+- Which articles are from a particular source?
+- Which articles have missing text?
+- How many articles come from each source?
+- Which articles were published during a particular period?
+
+Use R and `dbGetQuery()` to answer these questions.
+
+### Working Code {#sec-text-project-explore-sqlite-working-code}
+
+```         
+# Add queries here
+```
+
+### SQL Skills {#sec-text-project-explore-sqlite-sql-skills}
+
+Practice using:
+
+- `SELECT`
+- `WHERE`
+- `COUNT()`
+- `GROUP BY`
+- `ORDER BY`
+
+### Notes {#sec-text-project-explore-sqlite-notes}
+
+> Add notes here.
+
+## Conduct the Text Analysis {#sec-text-project-conduct-analysis}
+
+### Goal {#sec-text-project-conduct-analysis-goal}
+
+Use R to conduct the main text analysis.
+
+Possible analyses include:
+
+- word frequencies;
+- lexicon analysis;
+- sentiment analysis;
+- bigrams or n-grams;
+- comparisons between sources;
+- comparisons across time; and
+- other text-mining methods relevant to the research question.
+
+### Retrieve the Data {#sec-text-project-conduct-analysis-retrieve-the-data}
+
+Start by retrieving the necessary data from SQLite.
+
+```         
+# Add code here
+```
+
+### Analysis {#sec-text-project-conduct-analysis-analysis}
+
+```         
+# Add analysis here
+```
+
+### Visualizations {#sec-text-project-conduct-analysis-visualizations}
+
+```         
+# Add visualizations here
+```
+
+### Findings {#sec-text-project-conduct-analysis-findings}
+
+> Add preliminary findings here.
+
+## Produce the Final Quarto Report {#sec-text-project-final-report}
+
+### Goal {#sec-text-project-final-report-goal}
+
+Create a polished Quarto document presenting the results of the text analysis.
+
+This working guide documents **how the analysis was completed**.
+
+The final Quarto report communicates **what the analysis found**.
+
+The final report may include:
+
+- research question;
+- data sources;
+- methodology;
+- description of the articles;
+- text-processing methods;
+- text-analysis results;
+- visualizations;
+- interpretation;
+- limitations; and
+- conclusions.
+
+## Final Checklist {#sec-text-project-final-checklist}
+
+By the end of the project, you should be able to:
+
+- [ ] Import an Excel file into R.
+- [ ] Create and connect to a SQLite database from R.
+- [ ] Store an R data frame in SQLite.
+- [ ] Retrieve database data using R.
+- [ ] Write basic SQL queries using `dbGetQuery()`.
+- [ ] Extract article text from URLs.
+- [ ] Update the database with new information.
+- [ ] Prepare text for analysis.
+- [ ] Conduct text analysis in R.
+- [ ] Produce a reproducible Quarto report.
+
+## Final Workflow {#sec-text-project-final-workflow}
+
+```         
+flowchart TD
+    A[Excel Article List] --> B[Import into R]
+    B --> C[Create SQLite Database]
+    C --> D[Retrieve URLs into R]
+    D --> E[Extract Article Text]
+    E --> F[Update SQLite Database]
+    F --> G[Retrieve Data into R]
+    G --> H[Text Analysis]
+    H --> I[Quarto Report]
+```
+
+The goal is not only to complete this analysis, but to understand the workflow well enough to repeat it with a new collection of documents in the future.
+
+## Key Takeaways {#sec-text-project-key-takeaways}
+
+- Excel can be used as the original source of article information, while SQLite can become the main working database.
+- R can connect directly to SQLite using the `DBI` and `RSQLite` packages.
+- SQLite makes it easier to store, organize, retrieve, and update article data as the project grows.
+- SQL commands can be sent to the database from R using functions such as `dbGetQuery()`.
+- A unique `article_id` helps keep each article connected to its text and future analysis results.
+- Article text can be extracted in R and then written back to the SQLite database.
+- SQL is useful for filtering, counting, grouping, and retrieving data before analysis.
+- R remains the primary tool for text cleaning, tokenization, sentiment analysis, visualization, and other text-mining tasks.
+- Quarto can be used to document the entire workflow and produce the final analysis.
+- The overall workflow can be reused with future collections of articles or other documents.
+
+## Checklist {#sec-text-project-checklist}
+
+## Data Preparation {#sec-text-project-checklist-data-preparation}
+
+- [ ] Imported the original Excel file into R.
+- [ ] Confirmed that one row represents one article.
+- [ ] Checked for missing or duplicate URLs.
+- [ ] Created a unique `article_id`.
+
+## SQLite Database {#sec-text-project-checklist-sqlite-database}
+
+- [ ] Connected R to SQLite.
+- [ ] Created the SQLite database.
+- [ ] Stored the article data in an `articles` table.
+- [ ] Confirmed that the database contains the expected number of records.
+- [ ] Retrieved data from SQLite into R.
+
+## Article Text {#sec-text-project-checklist-article-text}
+
+- [ ] Tested article-text extraction using one URL.
+- [ ] Extracted text from all possible articles.
+- [ ] Identified any failed article extractions.
+- [ ] Created an `article_text` variable.
+- [ ] Updated the SQLite database with the extracted text.
+
+## SQL Practice {#sec-text-project-checklist-sql-practice}
+
+- [ ] Used `SELECT` to retrieve data.
+- [ ] Used `WHERE` to filter records.
+- [ ] Used `COUNT()` to count records.
+- [ ] Used `GROUP BY` to summarize groups.
+- [ ] Used `ORDER BY` to sort query results.
+- [ ] Used `UPDATE` or another database-writing method to update stored data.
+
+## Text Analysis {#sec-text-project-checklist-text-analysis}
+
+- [ ] Retrieved the necessary data from SQLite.
+- [ ] Cleaned and tokenized the article text.
+- [ ] Conducted the selected text analyses.
+- [ ] Created appropriate visualizations.
+- [ ] Documented the main findings.
+
+## Final Output {#sec-text-project-checklist-final-output}
+
+- [ ] Produced a reproducible Quarto report.
+- [ ] Documented important problems and decisions.
+- [ ] Confirmed that the workflow can be repeated with a new collection of documents.
+
+## Key Functions and Commands {#sec-text-project-key-functions}
+
+## Excel and Data Import {#sec-text-project-key-functions-excel-and-data-import}
+
+| Function       | Purpose                            |
+|----------------|------------------------------------|
+| `read_excel()` | Import an Excel file into R        |
+| `head()`       | View the first rows of a dataset   |
+| `str()`        | Inspect the structure of a dataset |
+| `nrow()`       | Count the number of rows           |
+| `duplicated()` | Check for duplicate values         |
+| `is.na()`      | Check for missing values           |
+
+## Connecting R to SQLite {#sec-text-project-key-functions-connecting-r-to-sqlite}
+
+|                  |                                        |
+|------------------|----------------------------------------|
+| Function         | Purpose                                |
+| `dbConnect()`    | Connect R to a database                |
+| `SQLite()`       | Tell R to use SQLite                   |
+| `dbDisconnect()` | Close the database connection          |
+| `dbListTables()` | List the tables stored in the database |
+
+## Reading and Writing Database Data {#sec-text-project-key-functions-reading-and-writing-database-data}
+
+|                  |                                                   |
+|------------------|---------------------------------------------------|
+| Function         | Purpose                                           |
+| `dbWriteTable()` | Write an R data frame to SQLite                   |
+| `dbReadTable()`  | Read an entire SQLite table into R                |
+| `dbGetQuery()`   | Send a SQL query to SQLite and return the results |
+| `dbExecute()`    | Send a SQL command that changes the database      |
+
+## Basic SQL Commands {#sec-text-project-key-functions-basic-sql-commands}
+
+|            |                                      |
+|------------|--------------------------------------|
+| Command    | Purpose                              |
+| `SELECT`   | Choose columns or values to retrieve |
+| `FROM`     | Identify the table being queried     |
+| `WHERE`    | Filter records                       |
+| `COUNT()`  | Count records                        |
+| `GROUP BY` | Group records before summarizing     |
+| `ORDER BY` | Sort query results                   |
+| `UPDATE`   | Change existing records              |
+| `IS NULL`  | Identify missing database values     |
+
+## Web Scraping {#sec-text-project-key-functions-web-scraping}
+
+|                   |                                          |
+|-------------------|------------------------------------------|
+| Function          | Purpose                                  |
+| `read_html()`     | Read the HTML from a webpage             |
+| `html_elements()` | Select elements from a webpage           |
+| `html_text2()`    | Extract text from selected HTML elements |
+
+## Text Analysis {#sec-text-project-key-functions-text-analysis}
+
+|                    |                                             |
+|--------------------|---------------------------------------------|
+| Function / Package | Purpose                                     |
+| `unnest_tokens()`  | Break text into individual words or tokens  |
+| `anti_join()`      | Remove stop words or other unwanted matches |
+| `count()`          | Count words or other values                 |
+| `get_sentiments()` | Load a sentiment lexicon                    |
+| `inner_join()`     | Match words with a sentiment lexicon        |
+| `ggplot()`         | Create visualizations                       |

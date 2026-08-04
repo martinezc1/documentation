@@ -1,0 +1,96 @@
+# About This Guide {.unnumbered}
+
+This guide was created as a working resource for the **Text Analytics & Computational Social Science Track** within the NYC Open Data Lab.
+
+The purpose of this guide is not to provide a comprehensive introduction to SQL. Instead, it is designed to help students incorporate **SQL and relational databases into existing R workflows** while working on real text-analysis projects.
+
+Students using this guide are expected to have experience working in R but may have little or no previous experience with SQL.
+
+## How This Guide Works
+
+The guide combines two types of resources:
+
+- **Implementation chapters** introduce SQL, SQLite, databases, and the R packages used to work with them.
+- **Project chapters** provide step-by-step working plans for applying those skills to actual internship projects.
+
+Project chapters are intentionally designed as working documents. They include:
+
+- project goals;
+- tasks and checkpoints;
+- space for working code;
+- space for notes and decisions;
+- SQL skills to practice; and
+- reusable workflows.
+
+Students should add their own code and notes as they work through each project.
+
+The goal is for these chapters to become more useful over time. After completing a project, a student should be able to return to the completed chapter as a reference when beginning a similar project in the future.
+
+## Current Chapters
+
+### @sec-databases-sql-r
+
+This chapter provides an introduction to databases, SQL, and SQLite within R. It covers the fundamentals of connecting to databases, exploring and querying tables, creating databases from existing files, and using SQL alongside familiar R workflows.
+
+### @sec-text-project
+
+This chapter applies these concepts to a working text-analysis project. Students move from an existing Excel file to a SQLite database, extract article text using R, practice SQL throughout the workflow, and prepare the resulting data for text analysis and a final Quarto report.
+
+
+## R, SQL, and SQLite
+
+Throughout this guide, **R remains the primary working environment**.
+
+We will use:
+
+- **R** for data preparation, analysis, visualization, and reporting;
+- **SQL** for querying, filtering, summarizing, joining, and managing relational data;
+- **SQLite** for storing project data in relational databases;
+- **DBI** and **RSQLite** to connect R to SQLite; and
+- **Quarto** for documenting reproducible workflows and communicating results.
+
+The goal is not to replace R with SQL.
+
+Instead, students will learn how SQL can become another tool within an R-based analytical workflow.
+
+## Using This Guide
+
+This guide is intended to grow alongside the internship.
+
+The first chapters introduce the fundamentals of working with databases and SQL in R and then apply those concepts to a text-analysis project.
+
+Future chapters may introduce new projects, database structures, SQL techniques, or analytical workflows as they become relevant.
+
+Students are encouraged to use the working sections of this guide to document:
+
+> **What did I do?**
+> **Why did I do it?**
+> **What problems did I encounter?**
+> **How did I solve them?**
+> **Could I reproduce this workflow on my own?**
+
+The goal is not simply to complete an individual project.
+
+The goal is to gradually build a **reusable record of how to work with SQL, SQLite, and R** that can support increasingly independent work on future projects.
+
+## Text Analytics & Computational Social Science Track
+
+The Text Analytics & Computational Social Science Track focuses on using reproducible computational methods to explore language, communication, and public discourse.
+
+Projects may use news articles, government documents, speeches, public comments, song lyrics, or other publicly available text.
+
+Depending on the project, students may gain experience with:
+
+- text mining
+- sentiment and lexicon analysis
+- natural language processing
+- relational databases and SQL
+- data visualization
+- reproducible research
+- Git and GitHub
+- Quarto
+- technical and public-facing communication
+
+Quality, reproducibility, thoughtful interpretation, and documentation are prioritized over the number of completed projects.
+
+Ultimately, the goal is for students to leave the internship not only with completed analytical work, but with **reproducible workflows they understand well enough to use again.**

@@ -1,0 +1,457 @@
+---
+title: "NYC 311 Dashboard Internship Plan"
+subtitle: "NYC Open Data Lab | Summer 2026"
+author: "Christian A. Martinez"
+date: "July 2026"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    theme: Lumen
+---
+
+# Project Overview
+
+## Objective
+
+The goal of this internship is to design, build, and deploy an interactive Shiny dashboard that allows users to explore and analyze New York City's 311 service request data using the `nycOpenData` R package.
+
+By the conclusion of the internship, the dashboard should allow users to:
+
+- Explore 311 requests across New York City
+- Filter data by borough, complaint type, agency, and date
+- View trends through interactive visualizations
+- Display summary statistics
+- Explore complaints geographically
+- Serve as an example dashboard for future NYC Open Data Lab projects
+
+## Roadmap
+
+```{mermaid}
+flowchart LR
+  A[Week 0: Setup] --> B[Week 1: Prototype]
+  B --> C[Week 2: Data Pipeline]
+  C --> D[Week 3: Interactivity]
+  D --> E[Week 4: Design]
+  E --> F[Week 5: Testing]
+  F --> G[Final Release]
+```
+
+------------------------------------------------------------------------
+
+# Timeline
+
+The internship is organized into weekly milestones.
+
+**Deadlines:** Every Wednesday
+
+Each week has:
+
+- A primary goal
+- Required milestones
+- Expected deliverables
+- Defined responsibilities
+- Success criteria
+
+## Milestone Calendar
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+library(calendR)
+
+july <- calendR(year = 2026, 
+        month = 7,
+        special.days = c(29),
+        special.col = "#bfe2f2",
+        low.col = "white")
+july
+
+august <- calendR(year = 2026, 
+        month = 8,
+        special.days = c(5, 12, 19, 26, 31),
+        special.col = "#bfe2f2",
+        low.col = "white")
+
+
+august
+```
+
+## Development Timeline
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+library(tidyverse)
+library(ggthemes)
+
+schedule_data <- tibble(
+  week = factor(
+    c("0", "1", "2", "3", "4", "5", "6"),
+    levels = c("0", "1", "2", "3", "4", "5", "6")
+  ),
+  start = c(0, 1, 2, 3, 4, 5, 6),
+  end = c(1, 2, 3, 4, 5, 6, 7),
+  milestone = c(
+    "Project Preparation",
+    "First Prototype",
+    "Data Layer",
+    "Interactive Dashboard",
+    "Improve User Interface",
+    "Testing and Documentation",
+    "Finalize Project"
+  )) |>
+  mutate(
+    milestone = fct_rev(factor(milestone)))
+
+schedule_graph <- ggplot(
+  schedule_data,
+  aes(
+    x = start, xend = end, y = milestone, yend = milestone, color = week)) +
+  geom_segment(
+    linewidth = 8,
+    lineend = "round") +
+  scale_x_continuous(
+    breaks = 0:7,
+    labels = c(
+      "Jul 22",
+      "Jul 29",
+      "Aug 5",
+      "Aug 12",
+      "Aug 19",
+      "Aug 26",
+      "Aug 27",
+      "Aug 31"), expand = expansion(mult = c(0.02, 0.05))) +
+  labs(
+    title = "Project Schedule",
+    subtitle = "Weekly milestones for the Summer 2026 internship",
+    x = "Milestone Date",
+    y = NULL,
+    color = "Week") +
+  theme_wsj() +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+schedule_graph
+```
+
+------------------------------------------------------------------------
+
+# Week 0
+
+**July 22 – July 28**
+
+## Goal
+
+Project preparation and environment setup.
+
+This week focuses on creating the project infrastructure so development can begin immediately during Week 1.
+
+## Responsibilities
+
+### Christian
+
+- Create GitHub repository
+- Initialize project structure
+- Configure project folders
+- Install required packages
+- Create initial README
+- Provide starter Shiny template
+- Identify initial NYC 311 datasets
+- Meet with intern to discuss project goals
+
+### Intern
+
+- Clone repository
+- Install R/RStudio if necessary
+- Review introductory Shiny resources
+- Become familiar with the NYC Open Data Portal
+- Explore the `nycOpenData` package documentation
+
+## Deliverables
+
+- Working project repository
+- Starter Shiny application
+- Development environment configured
+- Repository successfully cloned locally
+
+## Success Criteria
+
+By the end of Week 0 both mentor and intern should be able to launch the starter application using
+
+``` r
+shiny::runApp()
+```
+
+------------------------------------------------------------------------
+
+# Week 1
+
+**Due: Wednesday, July 29**
+
+## Goal
+
+Build the first functional prototype.
+
+## Milestones
+
+- Understand basic Shiny architecture
+- Learn the relationship between UI and Server
+- Load NYC 311 data using `nycOpenData`
+- Display one interactive visualization
+- Display one summary table
+
+## Deliverables
+
+A functional prototype containing
+
+- Sidebar
+- Main panel
+- One plot
+- One table
+- Live NYC Open Data
+
+## Responsibilities
+
+Christian
+
+- Pair program
+- Explain reactive programming
+- Review project organization
+
+Intern
+
+- Build initial application
+- Push code to GitHub
+- Document weekly progress
+
+## Success Criteria
+
+A user can launch the application and successfully view NYC 311 data.
+
+------------------------------------------------------------------------
+
+# Week 2
+
+**Due: Wednesday, August 5**
+
+## Goal
+
+Develop the data layer.
+
+## Milestones
+
+- Build reusable data functions
+- Clean and organize incoming data
+- Separate code into helper scripts
+- Create reusable plotting functions
+
+## Deliverables
+
+- Clean data pipeline
+- Reusable functions
+- Multiple visualizations
+- Updated documentation
+
+## Responsibilities
+
+Christian
+
+- Code review
+- Provide guidance
+
+Intern
+
+- Implement data pipeline
+- Improve project organization
+
+## Success Criteria
+
+Dashboard can reliably retrieve and visualize current NYC 311 data.
+
+------------------------------------------------------------------------
+
+# Week 3
+
+**Due: Wednesday, August 12**
+
+## Goal
+
+Create an interactive dashboard.
+
+## Milestones
+
+Add user controls
+
+- Borough
+- Complaint Type
+- Agency
+- Date Range
+
+Add outputs
+
+- Complaint counts
+- Time series
+- Top complaints table
+- Borough comparison
+
+## Deliverables
+
+Interactive dashboard capable of responding to user input.
+
+## Responsibilities
+
+Christian
+
+- Weekly review meeting
+
+Intern
+
+- Independent feature development
+
+## Success Criteria
+
+Users can meaningfully explore NYC 311 data through dashboard filters.
+
+------------------------------------------------------------------------
+
+# Week 4
+
+**Due: Wednesday, August 19**
+
+## Goal
+
+Improve user experience.
+
+## Milestones
+
+- Improve dashboard layout
+- Add value boxes
+- Improve styling
+- Improve loading speed
+- Refactor repetitive code
+
+Optional stretch goals
+
+- Leaflet map
+- Download buttons
+- Additional plots
+
+## Deliverables
+
+Professional-looking dashboard suitable for demonstration.
+
+## Responsibilities
+
+Christian
+
+- Design feedback
+
+Intern
+
+- Independent implementation
+
+## Success Criteria
+
+Dashboard is visually polished and responsive.
+
+------------------------------------------------------------------------
+
+# Week 5
+
+**Due: Wednesday, August 26**
+
+## Goal
+
+Testing and documentation.
+
+## Milestones
+
+- Test all dashboard features
+- Fix bugs
+- Improve comments
+- Update README
+- Create installation instructions
+
+## Deliverables
+
+- Stable dashboard
+- Documentation
+- GitHub repository ready for public release
+
+## Responsibilities
+
+Christian
+
+- Final code review
+
+Intern
+
+- Bug fixing
+- Documentation
+
+## Success Criteria
+
+Another user can clone the repository and successfully run the dashboard.
+
+------------------------------------------------------------------------
+
+# Week 6
+
+**August 27 – August 31**
+
+## Goal
+
+Finalize the project.
+
+## Milestones
+
+- Final presentation
+- Repository cleanup
+- Final documentation
+- Future improvement ideas
+
+## Deliverables
+
+Final project consisting of
+
+- Complete Shiny dashboard
+- Public GitHub repository
+- README
+- Installation guide
+- Final presentation/demo
+
+## Success Criteria
+
+The dashboard serves as a reproducible example project for the NYC Open Data Lab and can be maintained or extended by future interns.
+
+------------------------------------------------------------------------
+
+# Weekly Meeting Agenda
+
+Each Wednesday meeting will include
+
+1.  Progress demonstration
+2.  Review of completed milestones
+3.  Code review
+4.  Discussion of challenges
+5.  Goals for the following week
+
+------------------------------------------------------------------------
+
+# Definition of Success
+
+By the conclusion of the internship, the project should include
+
+- A fully functioning Shiny dashboard
+- NYC Open Data integration through the `nycOpenData` package
+- Clean and organized source code
+- Reproducible project structure
+- Public GitHub repository
+- Documentation suitable for future contributors
+
+The completed dashboard should become an official NYC Open Data Lab project and provide a foundation for future dashboard development within the lab.

@@ -1,0 +1,30 @@
+project:
+  type: book
+
+book:
+  title: "Using SQL in R"
+  subtitle: "A Practical Introduction to Databases, SQL, and R"
+  author: "Christian Martinez"
+  date: "8/4/2026"
+  chapters:
+    - index.qmd
+    - sql-documentation.qmd
+    - text-analysis.qmd
+
+link-citations: true
+number-sections: true
+
+format:
+  html:
+    theme:
+      - cosmo
+      - brand
+    code-copy: true
+    code-summary: "Show the code"
+    toc: true
+    number-sections: true
+  pdf:
+    documentclass: scrreprt
+
+editor: visual
+

@@ -1,0 +1,1412 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Using SQL in R",
+    "section": "",
+    "text": "About This Guide\nThis guide was created as a working resource for the Text Analytics & Computational Social Science Track within the NYC Open Data Lab.\nThe purpose of this guide is not to provide a comprehensive introduction to SQL. Instead, it is designed to help students incorporate SQL and relational databases into existing R workflows while working on real text-analysis projects.\nStudents using this guide are expected to have experience working in R but may have little or no previous experience with SQL.",
+    "crumbs": [
+      "About This Guide"
+    ]
+  },
+  {
+    "objectID": "index.html#what-is-a-database",
+    "href": "index.html#what-is-a-database",
+    "title": "Using SQL in R",
+    "section": "2.1 What is a Database?",
+    "text": "2.1 What is a Database?\nA database is an organized collection of data stored in one place.\nIf you’ve worked with Excel or R before, you already understand much of the basic idea.\nImagine you have three Excel files:\n\nstudents.xlsx\ncourses.xlsx\nenrollment.xlsx\n\nEach file contains different—but related—information.\nInstead of keeping these as three separate files, we could store them inside one database:\nschool_database.db\n│\n├── students\n├── courses\n└── enrollment\nEach of these is called a table.\nIf you’re familiar with R, you can think of a database table as being similar to a data frame:\n\n\n\nDatabase\nR\n\n\n\n\nDatabase\nCollection of related data\n\n\nTable\nData frame\n\n\nColumn\nVariable\n\n\nRow\nObservation\n\n\n\nThe important difference is that a database allows us to store many related tables together and easily work across them.\nFor example, our students table might contain:\nstudent_id | student_name | major\n-----------|--------------|------------\n001        | Alex         | Psychology\n002        | Taylor       | Biology\n003        | Jordan       | Psychology\nwhile enrollment might contain:\nstudent_id | course_id | grade\n-----------|-----------|------\n001        | PSY101    | 92\n001        | PSY200    | 88\n002        | BIO101    | 95\nNotice that both tables contain student_id.\nThat allows us to connect information across the database without needing to store everything in one enormous table.\n\n\n\n\n\n\nTipThink of a database as a container\n\n\n\nA database can contain many tables. Those tables can contain different types of information while still being connected to one another.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#what-is-sql",
+    "href": "index.html#what-is-sql",
+    "title": "Using SQL in R",
+    "section": "2.2 What is SQL?",
+    "text": "2.2 What is SQL?\nSQL stands for Structured Query Language.\nSQL is a language used to communicate with databases.\nThat’s really the main idea!\nWe can use SQL to ask a database questions such as:\n\nGive me every student.\nGive me only Psychology students.\nWhat is the average grade?\nWhich students are enrolled in each course?\nCombine the student information with their enrollment information.\n\nFor example, this SQL code:\nSELECT *\nFROM students;\nessentially means:\n\nGive me everything from the students table.\n\nWe can make our request more specific:\nSELECT *\nFROM students\nWHERE major = 'Psychology';\nwhich means:\n\nGive me all students whose major is Psychology.\n\nIf you already know dplyr, SQL will probably look surprisingly familiar.\nFor example, in R we might write:\nstudents |&gt;\n  filter(major == \"Psychology\") |&gt;\n  select(student_id, student_name)\nIn SQL, we could write:\nSELECT student_id, student_name\nFROM students\nWHERE major = 'Psychology';\n\n\n\n\n\n\nTipSQL is the language, not the database\n\n\n\nA database stores and organizes the data.\nSQL is the language we use to communicate with that database.\nThroughout this guide, we will use SQLite as our database system and SQL as the language used to work with it.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#so-where-does-r-come-in",
+    "href": "index.html#so-where-does-r-come-in",
+    "title": "Using SQL in R",
+    "section": "2.3 So Where Does R Come In?",
+    "text": "2.3 So Where Does R Come In?\nThis is where everything comes together.\nNormally, SQL can be written using dedicated database software. However, since we already know R, we don’t need to completely change our workflow just to start learning SQL.\nInstead, we can use R to connect to a database and send SQL commands to it.\nOur basic workflow will look something like this:\n          R\n          │\n          ▼\n    SQL Connection\n          │\n          ▼\n   ┌──────────────┐\n   │   Database   │\n   ├──────────────┤\n   │ students     │\n   │ courses      │\n   │ enrollment   │\n   └──────────────┘\n          │\n          ▼\n     SQL Query\n          │\n          ▼\n      Results\n          │\n          ▼\n          R\nThis gives us the best of both worlds.\nWe can use SQL to store, retrieve, filter, summarize, and combine data, while continuing to use R for visualization, statistical analysis, modeling, reporting, and everything else we already know how to do.\n\n\n\n\n\n\nTipTL;DR\n\n\n\n\nDatabase: Where our organized data lives.\nTable: A dataset inside the database, similar to an R data frame.\nSQL: The language we use to communicate with the database.\nSQLite: The database system we will use in this guide.\nR: The environment we will use to connect everything together.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#why-sqlite",
+    "href": "index.html#why-sqlite",
+    "title": "Using SQL in R",
+    "section": "3.1 Why SQLite?",
+    "text": "3.1 Why SQLite?\nThere are many database systems, including:\n\nSQLite\nPostgreSQL\nMySQL\nMicrosoft SQL Server\nOracle\n\nFor learning SQL, SQLite is particularly useful because the entire database can be stored in one file.\nFor example:\n\nproject_database.db\n\nWe do not need to install or manage a separate database server.\nThis makes SQLite an excellent way to learn the fundamentals of SQL while continuing to work within R.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#using-a-project-folder",
+    "href": "index.html#using-a-project-folder",
+    "title": "Using SQL in R",
+    "section": "4.1 Using a Project Folder",
+    "text": "4.1 Using a Project Folder\nFor larger projects, it is often helpful to keep the database inside its own folder.\nFor example:\nproject/\n├── data/\n├── database/\n├── scripts/\n└── analysis.qmd\nWe could then connect using:\ncon &lt;- DBI::dbConnect(\n  RSQLite::SQLite(),\n  file.path(\"database\", \"project_database.db\")\n)\nThis creates or connects to:\ndatabase/project_database.db\n\n\n\n\n\n\nTipStaying organized is key\n\n\n\nCreating an R Project helps keep your database, data, scripts, and other related files organized in one place.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#selecting-specific-columns",
+    "href": "index.html#selecting-specific-columns",
+    "title": "Using SQL in R",
+    "section": "6.1 Selecting Specific Columns",
+    "text": "6.1 Selecting Specific Columns\nOften, we do not need every column.\nSuppose students contains:\n\nstudent_id\nfirst_name\nlast_name\nmajor\ngpa\ngraduation_year\n\nWe could select only the student’s name and major:\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT first_name, last_name, major\n  FROM students;\n  \"\n)\nThis is an important database principle:\n\nOnly retrieve the information you actually need.\n\nThis becomes increasingly important when working with very large databases.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#filtering-data-with-where",
+    "href": "index.html#filtering-data-with-where",
+    "title": "Using SQL in R",
+    "section": "6.2 Filtering Data with WHERE",
+    "text": "6.2 Filtering Data with WHERE\nIn R, we might filter observations using filter().\nIn SQL, we use WHERE.\nFor example:\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT *\n  FROM students\n  WHERE major = 'Psychology';\n  \"\n)\nWe could also filter numeric values:\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT *\n  FROM students\n  WHERE gpa &gt;= 3.5;\n  \"\n)\nMultiple conditions can be combined using AND:\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT *\n  FROM students\n  WHERE major = 'Psychology'\n    AND gpa &gt;= 3.5;\n  \"\n)\nor OR:\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT *\n  FROM students\n  WHERE major = 'Psychology'\n     OR major = 'Biology';\n  \"\n)",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#sorting-with-order-by",
+    "href": "index.html#sorting-with-order-by",
+    "title": "Using SQL in R",
+    "section": "6.3 Sorting with ORDER BY",
+    "text": "6.3 Sorting with ORDER BY\nSQL uses ORDER BY to sort results.\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT first_name, last_name, gpa\n  FROM students\n  ORDER BY gpa DESC;\n  \"\n)\nDESC means descending.\nWe could instead use:\nORDER BY gpa ASC\nfor ascending order.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#limiting-results",
+    "href": "index.html#limiting-results",
+    "title": "Using SQL in R",
+    "section": "6.4 Limiting Results",
+    "text": "6.4 Limiting Results\nLarge databases may contain millions of rows.\nInstead of returning everything, SQL allows us to limit our results.\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT *\n  FROM students\n  LIMIT 10;\n  \"\n)\nThis returns only ten rows.\nWhen exploring unfamiliar databases, LIMIT is extremely useful.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#creating-new-variables-with-sql",
+    "href": "index.html#creating-new-variables-with-sql",
+    "title": "Using SQL in R",
+    "section": "6.5 Creating New Variables with SQL",
+    "text": "6.5 Creating New Variables with SQL\nSQL can also perform calculations.\nSuppose a table contains:\nplayer\ngames_played\npoints\nWe could calculate points per game:\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT\n    player,\n    games_played,\n    points,\n    CAST(points AS REAL) / games_played AS points_per_game\n  FROM player_stats;\n  \"\n)\nThe keyword AS creates an alias for our calculated column.\nHere:\nAS points_per_game\nnames the resulting calculation points_per_game.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#summarizing-data",
+    "href": "index.html#summarizing-data",
+    "title": "Using SQL in R",
+    "section": "6.6 Summarizing Data",
+    "text": "6.6 Summarizing Data\nSQL becomes particularly powerful when summarizing data.\nCommon SQL functions include:\n\n\n\nSQL\nPurpose\n\n\n\n\nCOUNT()\nCount observations\n\n\nSUM()\nCalculate a total\n\n\nAVG()\nCalculate a mean\n\n\nMIN()\nFind the minimum\n\n\nMAX()\nFind the maximum\n\n\n\nFor example:\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT AVG(gpa) AS average_gpa\n  FROM students;\n  \"\n)\nWe could calculate several statistics simultaneously:\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT\n    COUNT(*) AS total_students,\n    AVG(gpa) AS average_gpa,\n    MIN(gpa) AS minimum_gpa,\n    MAX(gpa) AS maximum_gpa\n  FROM students;\n  \"\n)",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#group-by",
+    "href": "index.html#group-by",
+    "title": "Using SQL in R",
+    "section": "6.7 GROUP BY",
+    "text": "6.7 GROUP BY\nOne of the most important SQL concepts is GROUP BY.\nSuppose we want the average GPA for each major.\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT\n    major,\n    COUNT(*) AS total_students,\n    AVG(gpa) AS average_gpa\n  FROM students\n  GROUP BY major;\n  \"\n)\nConceptually, this is similar to:\nstudents |&gt;\n  dplyr::group_by(major) |&gt;\n  dplyr::summarise(\n    total_students = dplyr::n(),\n    average_gpa = mean(gpa)\n  )\nLearning these relationships can make SQL easier for someone who already understands R.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#sql-joins",
+    "href": "index.html#sql-joins",
+    "title": "Using SQL in R",
+    "section": "6.8 SQL Joins",
+    "text": "6.8 SQL Joins\nOne of the biggest advantages of relational databases is that information can be stored across multiple related tables.\nFor example, imagine we have:\nstudents\ncourses\nenrollment\nInstead of repeating student and course information everywhere, tables can be connected using identifiers.\nFor example:\nstudents\n--------\nstudent_id\nstudent_name\nmajor\nenrollment\n----------\nstudent_id\ncourse_id\ngrade\nThe variable student_id connects the two tables.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#inner-join",
+    "href": "index.html#inner-join",
+    "title": "Using SQL in R",
+    "section": "6.9 INNER JOIN",
+    "text": "6.9 INNER JOIN\nAn INNER JOIN keeps observations that match in both tables.\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT\n    students.student_id,\n    students.student_name,\n    enrollment.course_id,\n    enrollment.grade\n  FROM students\n  INNER JOIN enrollment\n    ON students.student_id = enrollment.student_id;\n  \"\n)",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#left-join",
+    "href": "index.html#left-join",
+    "title": "Using SQL in R",
+    "section": "6.10 LEFT JOIN",
+    "text": "6.10 LEFT JOIN\nA LEFT JOIN keeps all observations from the left table.\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT\n    students.student_id,\n    students.student_name,\n    enrollment.course_id,\n    enrollment.grade\n  FROM students\n  LEFT JOIN enrollment\n    ON students.student_id = enrollment.student_id;\n  \"\n)\nThis is similar to:\ndplyr::left_join(\n  students,\n  enrollment,\n  by = \"student_id\"\n)",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#sql-and-dplyr-comparison",
+    "href": "index.html#sql-and-dplyr-comparison",
+    "title": "Using SQL in R",
+    "section": "6.11 SQL and dplyr Comparison",
+    "text": "6.11 SQL and dplyr Comparison\n\n\n\ndplyr\nSQL\n\n\n\n\nselect()\nSELECT\n\n\nfilter()\nWHERE\n\n\narrange()\nORDER BY\n\n\ngroup_by()\nGROUP BY\n\n\nsummarise()\naggregate functions\n\n\nmutate()\nexpressions in SELECT\n\n\nleft_join()\nLEFT JOIN\n\n\ninner_join()\nINNER JOIN\n\n\ndistinct()\nDISTINCT\n\n\n\nIf you already understand dplyr, many SQL concepts should feel familiar.\nThe major difference is the syntax.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#checking-our-new-database",
+    "href": "index.html#checking-our-new-database",
+    "title": "Using SQL in R",
+    "section": "8.1 Checking Our New Database",
+    "text": "8.1 Checking Our New Database\nAfter creating the database, we should verify that everything worked.\nDBI::dbListTables(con)\nWe can check the fields:\nDBI::dbListFields(\n  con,\n  \"students\"\n)\nWe can check the number of observations:\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT COUNT(*) AS total_rows\n  FROM students;\n  \"\n)\nAnd preview the data:\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT *\n  FROM students\n  LIMIT 10;\n  \"\n)\nThis verification step is important whenever databases are created programmatically.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#creating-new-tables-using-sql",
+    "href": "index.html#creating-new-tables-using-sql",
+    "title": "Using SQL in R",
+    "section": "8.2 Creating New Tables Using SQL",
+    "text": "8.2 Creating New Tables Using SQL\nWe can also use SQL itself to create tables.\nSuppose we want a table containing only high-performing students.\nDBI::dbExecute(\n  con,\n  \"\n  CREATE TABLE high_gpa_students AS\n  SELECT *\n  FROM students\n  WHERE gpa &gt;= 3.5;\n  \"\n)\nNow:\nDBI::dbListTables(con)\nwill include:\nhigh_gpa_students\nThis introduces an important distinction.\n\ndbGetQuery() is typically used when we want SQL to return data to R.\ndbExecute() is typically used when we want SQL to change something in the database.\n\nFor example:\nCREATE TABLE\nDROP TABLE\nINSERT INTO\nUPDATE\nDELETE\nare operations that modify the database.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#views",
+    "href": "index.html#views",
+    "title": "Using SQL in R",
+    "section": "8.3 Views",
+    "text": "8.3 Views\nSometimes we want a reusable query without creating another physical copy of the data.\nSQL provides views for this purpose.\nDBI::dbExecute(\n  con,\n  \"\n  CREATE VIEW psychology_students AS\n  SELECT *\n  FROM students\n  WHERE major = 'Psychology';\n  \"\n)\nWe can then query the view:\nDBI::dbGetQuery(\n  con,\n  \"\n  SELECT *\n  FROM psychology_students;\n  \"\n)\nViews can be extremely useful when a complicated query needs to be reused.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#using-sql-to-join-multiple-excel-files",
+    "href": "index.html#using-sql-to-join-multiple-excel-files",
+    "title": "Using SQL in R",
+    "section": "8.4 Using SQL to Join Multiple Excel Files",
+    "text": "8.4 Using SQL to Join Multiple Excel Files\nSuppose our original data came from:\nstudents.xlsx\ncourses.xlsx\nenrollment.xlsx\nAfter placing them into our database, we no longer need to manually merge the Excel files.\nInstead, SQL can connect them.\nstudent_courses &lt;- DBI::dbGetQuery(\n  con,\n  \"\n  SELECT\n    s.student_id,\n    s.student_name,\n    s.major,\n    c.course_name,\n    e.grade\n  FROM enrollment AS e\n  LEFT JOIN students AS s\n    ON e.student_id = s.student_id\n  LEFT JOIN courses AS c\n    ON e.course_id = c.course_id;\n  \"\n)\nNotice the use of aliases:\n\nstudents AS s\ncourses AS c\nenrollment AS e\n\nInstead of repeatedly writing:\n\nstudents.student_name\n\nwe can write:\n\ns.student_name\n\nAliases become especially helpful when working with large relational databases.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#primary-and-foreign-keys",
+    "href": "index.html#primary-and-foreign-keys",
+    "title": "Using SQL in R",
+    "section": "8.5 Primary and Foreign Keys",
+    "text": "8.5 Primary and Foreign Keys\nRelational databases work best when tables have clearly defined relationships.\nConsider:\nstudents\n--------\nstudent_id\nstudent_name\nmajor\nand:\nenrollment\n----------\nstudent_id\ncourse_id\ngrade\nstudent_id uniquely identifies students in the students table.\nThis is conceptually the primary key.\nThe student_id appearing in enrollment connects enrollment records back to students.\nThis acts as a foreign key.\nUnderstanding these relationships is essential when designing databases.\nA useful question to ask when creating each table is:\n\nWhat uniquely identifies one row?\n\n\nFor students: student_id\nFor courses: course_id\nFor games: game_id\nFor players: player_id\n\nWell-designed identifiers make SQL joins considerably easier and safer.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#connecting-to-and-exploring-a-database",
+    "href": "index.html#connecting-to-and-exploring-a-database",
+    "title": "Using SQL in R",
+    "section": "15.1 Connecting to and Exploring a Database",
+    "text": "15.1 Connecting to and Exploring a Database\n\nInstalled and loaded DBI and RSQLite\nCreated or identified the SQLite .db file\nConnected to the database using DBI::dbConnect()\nStored the connection as an object such as con\nChecked the available tables using DBI::dbListTables()\nExamined table columns using DBI::dbListFields()\nPreviewed tables before beginning an analysis\nUsed DBI::dbReadTable() when an entire table needed to be loaded into R",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#working-with-sql",
+    "href": "index.html#working-with-sql",
+    "title": "Using SQL in R",
+    "section": "15.2 Working with SQL",
+    "text": "15.2 Working with SQL\n\nUsed SELECT to choose the columns to retrieve\nUsed FROM to identify the table being queried\nUsed WHERE to filter observations\nCombined multiple conditions using AND or OR\nUsed ORDER BY to sort query results\nUsed LIMIT when only a small number of rows were needed\nUsed COUNT(), SUM(), AVG(), MIN(), or MAX() to summarize data\nUsed GROUP BY when summaries were needed for different groups\nUsed AS to create clear aliases for columns, calculations, or tables\nUsed INNER JOIN or LEFT JOIN to combine related tables\nChecked that tables were joined using the correct identifying variables\nSaved SQL query results as R objects when additional analysis was needed",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#creating-and-managing-a-database",
+    "href": "index.html#creating-and-managing-a-database",
+    "title": "Using SQL in R",
+    "section": "15.3 Creating and Managing a Database",
+    "text": "15.3 Creating and Managing a Database\n\nOrganized raw files, databases, scripts, and reports within the R Project\nImported Excel files into R using read_excel()\nDetermined which datasets should become separate database tables\nIdentified variables that uniquely identify observations within each table\nIdentified relationships between tables using shared identifiers\nCreated or connected to the SQLite database\nAdded R data frames to the database using DBI::dbWriteTable()\nVerified newly created tables using DBI::dbListTables()\nChecked the fields and number of observations in newly created tables\nUsed DBI::dbExecute() when creating or modifying database objects\nCreated a table or view using SQL when appropriate\nDisconnected from the database using DBI::dbDisconnect() when finished",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#r-functions",
+    "href": "index.html#r-functions",
+    "title": "Using SQL in R",
+    "section": "16.1 R Functions",
+    "text": "16.1 R Functions\n\nDBI::dbConnect(): Creates a connection between R and a database.\nRSQLite::SQLite(): Specifies SQLite as the database system when establishing a connection.\nDBI::dbListTables(): Lists the tables available within a connected database.\nDBI::dbListFields(): Lists the fields, or columns, contained within a database table.\nDBI::dbReadTable(): Reads an entire database table into R as a data frame.\nDBI::dbGetQuery(): Sends a SQL query to the database and returns the resulting data to R.\nDBI::dbWriteTable(): Writes an R data frame to the database as a table.\nDBI::dbExecute(): Executes SQL statements that modify the database rather than returning a dataset.\nDBI::dbDisconnect(): Closes the connection between R and the database.\nreadxl::read_excel(): Imports an Excel file into R before it is added to the database.\nfile.path(): Creates file paths in a way that works across operating systems and is useful for organizing database projects.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#sql-commands",
+    "href": "index.html#sql-commands",
+    "title": "Using SQL in R",
+    "section": "16.2 SQL Commands",
+    "text": "16.2 SQL Commands\n\nSELECT: Specifies the columns or information that should be returned by a query.\nFROM: Identifies the table from which data should be retrieved.\nWHERE: Filters rows based on one or more conditions.\nAND / OR: Combines multiple filtering conditions.\nORDER BY: Sorts query results according to one or more columns.\nASC / DESC: Specifies whether results should be sorted in ascending or descending order.\nLIMIT: Restricts the number of rows returned by a query.\nAS: Creates an alias for a column, calculation, or table.\nCOUNT(): Counts observations.\nSUM(): Calculates the total of a numeric column.\nAVG(): Calculates the average of a numeric column.\nMIN(): Returns the minimum value of a column.\nMAX(): Returns the maximum value of a column.\nGROUP BY: Groups observations so that summary calculations can be performed separately for each group.\nINNER JOIN: Combines tables while keeping only observations that match in both tables.\nLEFT JOIN: Combines tables while keeping all observations from the left table and matching information from the right table when available.\nON: Specifies the variables used to connect tables during a SQL join.\nCREATE TABLE: Creates a new table within the database.\nCREATE VIEW: Creates a reusable SQL query that can be queried similarly to a table without creating another physical copy of the data.\nCAST(): Converts a value from one data type to another.\nDROP TABLE: Removes a table from the database.\nINSERT INTO: Adds new records to an existing database table.\nUPDATE: Modifies existing records within a table.\nDELETE: Removes records from a table.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>A Practical Introduction to Databases, SQL, and R</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html",
+    "href": "text-analysis.html",
+    "title": "2  Text Analysis Project",
+    "section": "",
+    "text": "2.1 Project Overview\nThe goal of this project is to build a reproducible workflow for collecting, storing, and analyzing text from online articles.\nWe will use:\nThe general workflow is:\nThe goal is to create a workflow that can be reused for future text-analysis projects.\nBefore getting started, please refer to ?sec-databases-sql-r",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#project-overview",
+    "href": "text-analysis.html#project-overview",
+    "title": "2  Text Analysis Project",
+    "section": "",
+    "text": "Excel- as the original source of the article list.\nR- to import, clean, scrape, and analyze the data.\nSQLite- to store and organize the data.\nQuarto- to document and present the final analysis.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#goal",
+    "href": "text-analysis.html#goal",
+    "title": "2  Text Analysis Project",
+    "section": "3.1 Goal",
+    "text": "3.1 Goal\nLoad the existing Excel file into R and prepare it for the database.\nThe original Excel file should remain unchanged.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#tasks",
+    "href": "text-analysis.html#tasks",
+    "title": "2  Text Analysis Project",
+    "section": "3.2 Tasks",
+    "text": "3.2 Tasks\n\nLoad the required R packages.\nImport the Excel file.\nInspect the data.\nCheck for missing URLs.\nCheck for duplicate articles.\nCreate a unique article_id.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#working-code",
+    "href": "text-analysis.html#working-code",
+    "title": "2  Text Analysis Project",
+    "section": "3.3 Working Code",
+    "text": "3.3 Working Code\n\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#checkpoint",
+    "href": "text-analysis.html#checkpoint",
+    "title": "2  Text Analysis Project",
+    "section": "3.4 Checkpoint",
+    "text": "3.4 Checkpoint\nYou should now have:\n\none row per article;\na unique article_id;\na URL for each article; and\nan R data frame ready to be stored in SQLite.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#notes",
+    "href": "text-analysis.html#notes",
+    "title": "2  Text Analysis Project",
+    "section": "3.5 Notes",
+    "text": "3.5 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#goal-1",
+    "href": "text-analysis.html#goal-1",
+    "title": "2  Text Analysis Project",
+    "section": "4.1 Goal",
+    "text": "4.1 Goal\nCreate a SQLite database and connect to it using R.\nWe will use the DBI and RSQLite packages to work with SQLite from R.\nThe database can be called:\ntext_analysis.db\nThe first table will be:\narticles\nOne row in articles should represent one article.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#tasks-1",
+    "href": "text-analysis.html#tasks-1",
+    "title": "2  Text Analysis Project",
+    "section": "4.2 Tasks",
+    "text": "4.2 Tasks\n\nLoad DBI.\nLoad RSQLite.\nCreate/connect to text_analysis.db.\nAdd the article data to the database.\nConfirm that the articles table was created.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#working-code-1",
+    "href": "text-analysis.html#working-code-1",
+    "title": "2  Text Analysis Project",
+    "section": "4.3 Working Code",
+    "text": "4.3 Working Code\n\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#checkpoint-1",
+    "href": "text-analysis.html#checkpoint-1",
+    "title": "2  Text Analysis Project",
+    "section": "4.4 Checkpoint",
+    "text": "4.4 Checkpoint\nYou should now have a SQLite database containing an articles table.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#notes-1",
+    "href": "text-analysis.html#notes-1",
+    "title": "2  Text Analysis Project",
+    "section": "4.5 Notes",
+    "text": "4.5 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#goal-2",
+    "href": "text-analysis.html#goal-2",
+    "title": "2  Text Analysis Project",
+    "section": "5.1 Goal",
+    "text": "5.1 Goal\nPractice retrieving information from the SQLite database using R.\nInstead of continuing to use the original Excel file, the database should now become the working source for the project.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#tasks-2",
+    "href": "text-analysis.html#tasks-2",
+    "title": "2  Text Analysis Project",
+    "section": "5.2 Tasks",
+    "text": "5.2 Tasks\n\nList the tables in the database.\nRead the articles table into R.\nCount the number of articles.\nView several records.\nConfirm that the data matches the original Excel file.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#working-code-2",
+    "href": "text-analysis.html#working-code-2",
+    "title": "2  Text Analysis Project",
+    "section": "5.3 Working Code",
+    "text": "5.3 Working Code\n\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sql-skills",
+    "href": "text-analysis.html#sql-skills",
+    "title": "2  Text Analysis Project",
+    "section": "5.4 SQL Skills",
+    "text": "5.4 SQL Skills\nThis step is an opportunity to practice:\n\nSELECT\nFROM\nWHERE\nCOUNT()\n\nThese commands can be sent to SQLite directly from R using functions such as dbGetQuery().",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#notes-2",
+    "href": "text-analysis.html#notes-2",
+    "title": "2  Text Analysis Project",
+    "section": "5.5 Notes",
+    "text": "5.5 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#goal-3",
+    "href": "text-analysis.html#goal-3",
+    "title": "2  Text Analysis Project",
+    "section": "6.1 Goal",
+    "text": "6.1 Goal\nUse the URLs stored in the database to retrieve the text from each article.\nThis work will be completed in R.\nThe final data should contain the original article information plus a new variable:\narticle_text",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#tasks-3",
+    "href": "text-analysis.html#tasks-3",
+    "title": "2  Text Analysis Project",
+    "section": "6.2 Tasks",
+    "text": "6.2 Tasks\n\nRetrieve the article URLs from SQLite.\nTest text extraction using one article.\nInspect the extracted text.\nCreate a reusable function for extracting article text.\nApply the function to all articles.\nIdentify articles that could not be extracted.\nCreate the article_text column.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#test-one-article",
+    "href": "text-analysis.html#test-one-article",
+    "title": "2  Text Analysis Project",
+    "section": "6.3 Test One Article",
+    "text": "6.3 Test One Article\nBefore processing every article, make sure the process works with one URL.\n\n# Test code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#process-all-articles",
+    "href": "text-analysis.html#process-all-articles",
+    "title": "2  Text Analysis Project",
+    "section": "6.4 Process All Articles",
+    "text": "6.4 Process All Articles\n\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#checkpoint-2",
+    "href": "text-analysis.html#checkpoint-2",
+    "title": "2  Text Analysis Project",
+    "section": "6.5 Checkpoint",
+    "text": "6.5 Checkpoint\nYou should now have an R data frame containing:\n\nthe original article information;\narticle_id;\nurl; and\narticle_text.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#notes-3",
+    "href": "text-analysis.html#notes-3",
+    "title": "2  Text Analysis Project",
+    "section": "6.6 Notes",
+    "text": "6.6 Notes\nWere any articles unable to be extracted?\n\nAdd notes here.\n\nDid the extracted text contain unwanted webpage content?\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#goal-4",
+    "href": "text-analysis.html#goal-4",
+    "title": "2  Text Analysis Project",
+    "section": "7.1 Goal",
+    "text": "7.1 Goal\nSave the extracted article text back into SQLite.\nThe database should now contain both the original article information and the newly extracted text.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#tasks-4",
+    "href": "text-analysis.html#tasks-4",
+    "title": "2  Text Analysis Project",
+    "section": "7.2 Tasks",
+    "text": "7.2 Tasks\n\nWrite the updated data to SQLite.\nConfirm that article_text is stored.\nCheck for articles with missing text.\nConfirm that the number of articles has not changed.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#working-code-3",
+    "href": "text-analysis.html#working-code-3",
+    "title": "2  Text Analysis Project",
+    "section": "7.3 Working Code",
+    "text": "7.3 Working Code\n\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sql-skills-1",
+    "href": "text-analysis.html#sql-skills-1",
+    "title": "2  Text Analysis Project",
+    "section": "7.4 SQL Skills",
+    "text": "7.4 SQL Skills\nThis step is an opportunity to practice working with:\n\nUPDATE\nWHERE\nSELECT",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#checkpoint-3",
+    "href": "text-analysis.html#checkpoint-3",
+    "title": "2  Text Analysis Project",
+    "section": "7.5 Checkpoint",
+    "text": "7.5 Checkpoint\nThe articles table should now contain everything needed for the text analysis.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#notes-4",
+    "href": "text-analysis.html#notes-4",
+    "title": "2  Text Analysis Project",
+    "section": "7.6 Notes",
+    "text": "7.6 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#goal-5",
+    "href": "text-analysis.html#goal-5",
+    "title": "2  Text Analysis Project",
+    "section": "8.1 Goal",
+    "text": "8.1 Goal\nUse R to transform the article text into a format that can be analyzed.\nDepending on the analysis, this may include:\n\nconverting text to lowercase;\nremoving punctuation;\ntokenizing text;\nremoving stop words; and\ncreating word frequencies.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#tasks-5",
+    "href": "text-analysis.html#tasks-5",
+    "title": "2  Text Analysis Project",
+    "section": "8.2 Tasks",
+    "text": "8.2 Tasks\n\nLoad the article data from SQLite.\nTokenize the article text.\nClean the tokens as needed.\nPreserve article_id so words can be connected to their original articles.\nPrepare an analysis-ready dataset.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#working-code-4",
+    "href": "text-analysis.html#working-code-4",
+    "title": "2  Text Analysis Project",
+    "section": "8.3 Working Code",
+    "text": "8.3 Working Code\n\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#notes-5",
+    "href": "text-analysis.html#notes-5",
+    "title": "2  Text Analysis Project",
+    "section": "8.4 Notes",
+    "text": "8.4 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#goal-6",
+    "href": "text-analysis.html#goal-6",
+    "title": "2  Text Analysis Project",
+    "section": "9.1 Goal",
+    "text": "9.1 Goal\nUse the database to practice basic SQL queries before completing the main analysis in R.\nPossible questions include:\n\nHow many articles are in the database?\nWhich articles are from a particular source?\nWhich articles have missing text?\nHow many articles come from each source?\nWhich articles were published during a particular period?\n\nUse R and dbGetQuery() to answer these questions.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#working-code-5",
+    "href": "text-analysis.html#working-code-5",
+    "title": "2  Text Analysis Project",
+    "section": "9.2 Working Code",
+    "text": "9.2 Working Code\n\n# Add queries here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sql-skills-2",
+    "href": "text-analysis.html#sql-skills-2",
+    "title": "2  Text Analysis Project",
+    "section": "9.3 SQL Skills",
+    "text": "9.3 SQL Skills\nPractice using:\n\nSELECT\nWHERE\nCOUNT()\nGROUP BY\nORDER BY",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#notes-6",
+    "href": "text-analysis.html#notes-6",
+    "title": "2  Text Analysis Project",
+    "section": "9.4 Notes",
+    "text": "9.4 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#goal-7",
+    "href": "text-analysis.html#goal-7",
+    "title": "2  Text Analysis Project",
+    "section": "10.1 Goal",
+    "text": "10.1 Goal\nUse R to conduct the main text analysis.\nPossible analyses include:\n\nword frequencies;\nlexicon analysis;\nsentiment analysis;\nbigrams or n-grams;\ncomparisons between sources;\ncomparisons across time; and\nother text-mining methods relevant to the research question.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#retrieve-the-data",
+    "href": "text-analysis.html#retrieve-the-data",
+    "title": "2  Text Analysis Project",
+    "section": "10.2 Retrieve the Data",
+    "text": "10.2 Retrieve the Data\nStart by retrieving the necessary data from SQLite.\n\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#analysis",
+    "href": "text-analysis.html#analysis",
+    "title": "2  Text Analysis Project",
+    "section": "10.3 Analysis",
+    "text": "10.3 Analysis\n\n# Add analysis here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#visualizations",
+    "href": "text-analysis.html#visualizations",
+    "title": "2  Text Analysis Project",
+    "section": "10.4 Visualizations",
+    "text": "10.4 Visualizations\n\n# Add visualizations here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#findings",
+    "href": "text-analysis.html#findings",
+    "title": "2  Text Analysis Project",
+    "section": "10.5 Findings",
+    "text": "10.5 Findings\n\nAdd preliminary findings here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#goal-8",
+    "href": "text-analysis.html#goal-8",
+    "title": "2  Text Analysis Project",
+    "section": "11.1 Goal",
+    "text": "11.1 Goal\nCreate a polished Quarto document presenting the results of the text analysis.\nThis working guide documents how the analysis was completed.\nThe final Quarto report communicates what the analysis found.\nThe final report may include:\n\nresearch question;\ndata sources;\nmethodology;\ndescription of the articles;\ntext-processing methods;\ntext-analysis results;\nvisualizations;\ninterpretation;\nlimitations; and\nconclusions.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#data-preparation",
+    "href": "text-analysis.html#data-preparation",
+    "title": "2  Text Analysis Project",
+    "section": "15.1 Data Preparation",
+    "text": "15.1 Data Preparation\n\nImported the original Excel file into R.\nConfirmed that one row represents one article.\nChecked for missing or duplicate URLs.\nCreated a unique article_id.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sqlite-database",
+    "href": "text-analysis.html#sqlite-database",
+    "title": "2  Text Analysis Project",
+    "section": "15.2 SQLite Database",
+    "text": "15.2 SQLite Database\n\nConnected R to SQLite.\nCreated the SQLite database.\nStored the article data in an articles table.\nConfirmed that the database contains the expected number of records.\nRetrieved data from SQLite into R.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#article-text",
+    "href": "text-analysis.html#article-text",
+    "title": "2  Text Analysis Project",
+    "section": "15.3 Article Text",
+    "text": "15.3 Article Text\n\nTested article-text extraction using one URL.\nExtracted text from all possible articles.\nIdentified any failed article extractions.\nCreated an article_text variable.\nUpdated the SQLite database with the extracted text.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sql-practice",
+    "href": "text-analysis.html#sql-practice",
+    "title": "2  Text Analysis Project",
+    "section": "15.4 SQL Practice",
+    "text": "15.4 SQL Practice\n\nUsed SELECT to retrieve data.\nUsed WHERE to filter records.\nUsed COUNT() to count records.\nUsed GROUP BY to summarize groups.\nUsed ORDER BY to sort query results.\nUsed UPDATE or another database-writing method to update stored data.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#text-analysis",
+    "href": "text-analysis.html#text-analysis",
+    "title": "2  Text Analysis Project",
+    "section": "15.5 Text Analysis",
+    "text": "15.5 Text Analysis\n\nRetrieved the necessary data from SQLite.\nCleaned and tokenized the article text.\nConducted the selected text analyses.\nCreated appropriate visualizations.\nDocumented the main findings.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#final-output",
+    "href": "text-analysis.html#final-output",
+    "title": "2  Text Analysis Project",
+    "section": "15.6 Final Output",
+    "text": "15.6 Final Output\n\nProduced a reproducible Quarto report.\nDocumented important problems and decisions.\nConfirmed that the workflow can be repeated with a new collection of documents.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#excel-and-data-import",
+    "href": "text-analysis.html#excel-and-data-import",
+    "title": "2  Text Analysis Project",
+    "section": "16.1 Excel and Data Import",
+    "text": "16.1 Excel and Data Import\n\n\n\nFunction\nPurpose\n\n\n\n\nread_excel()\nImport an Excel file into R\n\n\nhead()\nView the first rows of a dataset\n\n\nstr()\nInspect the structure of a dataset\n\n\nnrow()\nCount the number of rows\n\n\nduplicated()\nCheck for duplicate values\n\n\nis.na()\nCheck for missing values",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#connecting-r-to-sqlite",
+    "href": "text-analysis.html#connecting-r-to-sqlite",
+    "title": "2  Text Analysis Project",
+    "section": "16.2 Connecting R to SQLite",
+    "text": "16.2 Connecting R to SQLite\n\n\n\nFunction\nPurpose\n\n\n\n\ndbConnect()\nConnect R to a database\n\n\nSQLite()\nTell R to use SQLite\n\n\ndbDisconnect()\nClose the database connection\n\n\ndbListTables()\nList the tables stored in the database",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#reading-and-writing-database-data",
+    "href": "text-analysis.html#reading-and-writing-database-data",
+    "title": "2  Text Analysis Project",
+    "section": "16.3 Reading and Writing Database Data",
+    "text": "16.3 Reading and Writing Database Data\n\n\n\nFunction\nPurpose\n\n\n\n\ndbWriteTable()\nWrite an R data frame to SQLite\n\n\ndbReadTable()\nRead an entire SQLite table into R\n\n\ndbGetQuery()\nSend a SQL query to SQLite and return the results\n\n\ndbExecute()\nSend a SQL command that changes the database",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#basic-sql-commands",
+    "href": "text-analysis.html#basic-sql-commands",
+    "title": "2  Text Analysis Project",
+    "section": "16.4 Basic SQL Commands",
+    "text": "16.4 Basic SQL Commands\n\n\n\nCommand\nPurpose\n\n\n\n\nSELECT\nChoose columns or values to retrieve\n\n\nFROM\nIdentify the table being queried\n\n\nWHERE\nFilter records\n\n\nCOUNT()\nCount records\n\n\nGROUP BY\nGroup records before summarizing\n\n\nORDER BY\nSort query results\n\n\nUPDATE\nChange existing records\n\n\nIS NULL\nIdentify missing database values",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#text-analysis-1",
+    "href": "text-analysis.html#text-analysis-1",
+    "title": "2  Text Analysis Project",
+    "section": "16.5 Text Analysis",
+    "text": "16.5 Text Analysis\n\n\n\nFunction / Package\nPurpose\n\n\n\n\nunnest_tokens()\nBreak text into individual words or tokens\n\n\nanti_join()\nRemove stop words or other unwanted matches\n\n\ncount()\nCount words or other values\n\n\nget_sentiments()\nLoad a sentiment lexicon\n\n\ninner_join()\nMatch words with a sentiment lexicon\n\n\nggplot()\nCreate visualizations",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#how-this-guide-works",
+    "href": "index.html#how-this-guide-works",
+    "title": "Using SQL in R",
+    "section": "How This Guide Works",
+    "text": "How This Guide Works\nThe guide combines two types of resources:\n\nImplementation chapters introduce SQL, SQLite, databases, and the R packages used to work with them.\nProject chapters provide step-by-step working plans for applying those skills to actual internship projects.\n\nProject chapters are intentionally designed as working documents. They include:\n\nproject goals;\ntasks and checkpoints;\nspace for working code;\nspace for notes and decisions;\nSQL skills to practice; and\nreusable workflows.\n\nStudents should add their own code and notes as they work through each project.\nThe goal is for these chapters to become more useful over time. After completing a project, a student should be able to return to the completed chapter as a reference when beginning a similar project in the future.",
+    "crumbs": [
+      "About This Guide"
+    ]
+  },
+  {
+    "objectID": "index.html#r-sql-and-sqlite",
+    "href": "index.html#r-sql-and-sqlite",
+    "title": "Using SQL in R",
+    "section": "R, SQL, and SQLite",
+    "text": "R, SQL, and SQLite\nThroughout this guide, R remains the primary working environment.\nWe will use:\n\nR for data preparation, analysis, visualization, and reporting;\nSQL for querying, filtering, summarizing, joining, and managing relational data;\nSQLite for storing project data in relational databases;\nDBI and RSQLite to connect R to SQLite; and\nQuarto for documenting reproducible workflows and communicating results.\n\nThe goal is not to replace R with SQL.\nInstead, students will learn how SQL can become another tool within an R-based analytical workflow.",
+    "crumbs": [
+      "About This Guide"
+    ]
+  },
+  {
+    "objectID": "index.html#using-this-guide",
+    "href": "index.html#using-this-guide",
+    "title": "Using SQL in R",
+    "section": "Using This Guide",
+    "text": "Using This Guide\nThis guide is intended to grow alongside the internship.\nThe first chapters introduce the fundamentals of working with databases and SQL in R and then apply those concepts to a text-analysis project.\nFuture chapters may introduce new projects, database structures, SQL techniques, or analytical workflows as they become relevant.\nStudents are encouraged to use the working sections of this guide to document:\n\nWhat did I do? Why did I do it? What problems did I encounter? How did I solve them? Could I reproduce this workflow on my own?\n\nThe goal is not simply to complete an individual project.\nThe goal is to gradually build a reusable record of how to work with SQL, SQLite, and R that can support increasingly independent work on future projects.",
+    "crumbs": [
+      "About This Guide"
+    ]
+  },
+  {
+    "objectID": "index.html#text-analytics-computational-social-science-track",
+    "href": "index.html#text-analytics-computational-social-science-track",
+    "title": "Using SQL in R",
+    "section": "Text Analytics & Computational Social Science Track",
+    "text": "Text Analytics & Computational Social Science Track\nThe Text Analytics & Computational Social Science Track focuses on using reproducible computational methods to explore language, communication, and public discourse.\nProjects may use news articles, government documents, speeches, public comments, song lyrics, or other publicly available text.\nDepending on the project, students may gain experience with:\n\ntext mining\nsentiment and lexicon analysis\nnatural language processing\nrelational databases and SQL\ndata visualization\nreproducible research\nGit and GitHub\nQuarto\ntechnical and public-facing communication\n\nQuality, reproducibility, thoughtful interpretation, and documentation are prioritized over the number of completed projects.\nUltimately, the goal is for students to leave the internship not only with completed analytical work, but with reproducible workflows they understand well enough to use again.",
+    "crumbs": [
+      "About This Guide"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-overview",
+    "href": "text-analysis.html#sec-text-project-overview",
+    "title": "2  Text Analysis Project",
+    "section": "",
+    "text": "Excel: as the original source of the article list.\nR: to import, clean, scrape, and analyze the data.\nSQLite: to store and organize the data.\nQuarto: to document and present the final analysis.\n\n\nflowchart LR\n    A[Excel] --&gt; B[R]\n    B --&gt; C[SQLite Database]\n    C --&gt; D[R: Extract Text]\n    D --&gt; E[SQLite Database]\n    E --&gt; F[R: Text Analysis]\n    F --&gt; G[Quarto Report]",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-import-excel-goal",
+    "href": "text-analysis.html#sec-text-project-import-excel-goal",
+    "title": "2  Text Analysis Project",
+    "section": "3.1 Goal",
+    "text": "3.1 Goal\nLoad the existing Excel file into R and prepare it for the database.\nThe original Excel file should remain unchanged.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-import-excel-tasks",
+    "href": "text-analysis.html#sec-text-project-import-excel-tasks",
+    "title": "2  Text Analysis Project",
+    "section": "3.2 Tasks",
+    "text": "3.2 Tasks\n\nLoad the required R packages.\nImport the Excel file.\nInspect the data.\nCheck for missing URLs.\nCheck for duplicate articles.\nCreate a unique article_id.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-import-excel-working-code",
+    "href": "text-analysis.html#sec-text-project-import-excel-working-code",
+    "title": "2  Text Analysis Project",
+    "section": "3.3 Working Code",
+    "text": "3.3 Working Code\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-import-excel-checkpoint",
+    "href": "text-analysis.html#sec-text-project-import-excel-checkpoint",
+    "title": "2  Text Analysis Project",
+    "section": "3.4 Checkpoint",
+    "text": "3.4 Checkpoint\nYou should now have:\n\none row per article;\na unique article_id;\na URL for each article; and\nan R data frame ready to be stored in SQLite.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-import-excel-notes",
+    "href": "text-analysis.html#sec-text-project-import-excel-notes",
+    "title": "2  Text Analysis Project",
+    "section": "3.5 Notes",
+    "text": "3.5 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-create-sqlite-goal",
+    "href": "text-analysis.html#sec-text-project-create-sqlite-goal",
+    "title": "2  Text Analysis Project",
+    "section": "4.1 Goal",
+    "text": "4.1 Goal\nCreate a SQLite database and connect to it using R.\nWe will use the DBI and RSQLite packages to work with SQLite from R.\nThe database can be called:\ntext_analysis.db\nThe first table will be:\narticles\nOne row in articles should represent one article.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-create-sqlite-tasks",
+    "href": "text-analysis.html#sec-text-project-create-sqlite-tasks",
+    "title": "2  Text Analysis Project",
+    "section": "4.2 Tasks",
+    "text": "4.2 Tasks\n\nLoad DBI.\nLoad RSQLite.\nCreate/connect to text_analysis.db.\nAdd the article data to the database.\nConfirm that the articles table was created.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-create-sqlite-working-code",
+    "href": "text-analysis.html#sec-text-project-create-sqlite-working-code",
+    "title": "2  Text Analysis Project",
+    "section": "4.3 Working Code",
+    "text": "4.3 Working Code\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-create-sqlite-checkpoint",
+    "href": "text-analysis.html#sec-text-project-create-sqlite-checkpoint",
+    "title": "2  Text Analysis Project",
+    "section": "4.4 Checkpoint",
+    "text": "4.4 Checkpoint\nYou should now have a SQLite database containing an articles table.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-create-sqlite-notes",
+    "href": "text-analysis.html#sec-text-project-create-sqlite-notes",
+    "title": "2  Text Analysis Project",
+    "section": "4.5 Notes",
+    "text": "4.5 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-read-sqlite-goal",
+    "href": "text-analysis.html#sec-text-project-read-sqlite-goal",
+    "title": "2  Text Analysis Project",
+    "section": "5.1 Goal",
+    "text": "5.1 Goal\nPractice retrieving information from the SQLite database using R.\nInstead of continuing to use the original Excel file, the database should now become the working source for the project.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-read-sqlite-tasks",
+    "href": "text-analysis.html#sec-text-project-read-sqlite-tasks",
+    "title": "2  Text Analysis Project",
+    "section": "5.2 Tasks",
+    "text": "5.2 Tasks\n\nList the tables in the database.\nRead the articles table into R.\nCount the number of articles.\nView several records.\nConfirm that the data matches the original Excel file.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-read-sqlite-working-code",
+    "href": "text-analysis.html#sec-text-project-read-sqlite-working-code",
+    "title": "2  Text Analysis Project",
+    "section": "5.3 Working Code",
+    "text": "5.3 Working Code\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-read-sqlite-sql-skills",
+    "href": "text-analysis.html#sec-text-project-read-sqlite-sql-skills",
+    "title": "2  Text Analysis Project",
+    "section": "5.4 SQL Skills",
+    "text": "5.4 SQL Skills\nThis step is an opportunity to practice:\n\nSELECT\nFROM\nWHERE\nCOUNT()\n\nThese commands can be sent to SQLite directly from R using functions such as dbGetQuery().",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-read-sqlite-notes",
+    "href": "text-analysis.html#sec-text-project-read-sqlite-notes",
+    "title": "2  Text Analysis Project",
+    "section": "5.5 Notes",
+    "text": "5.5 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-extract-text-goal",
+    "href": "text-analysis.html#sec-text-project-extract-text-goal",
+    "title": "2  Text Analysis Project",
+    "section": "6.1 Goal",
+    "text": "6.1 Goal\nUse the URLs stored in the database to retrieve the text from each article.\nThis work will be completed in R.\nThe final data should contain the original article information plus a new variable:\narticle_text",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-extract-text-tasks",
+    "href": "text-analysis.html#sec-text-project-extract-text-tasks",
+    "title": "2  Text Analysis Project",
+    "section": "6.2 Tasks",
+    "text": "6.2 Tasks\n\nRetrieve the article URLs from SQLite.\nTest text extraction using one article.\nInspect the extracted text.\nCreate a reusable function for extracting article text.\nApply the function to all articles.\nIdentify articles that could not be extracted.\nCreate the article_text column.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-extract-text-example-code",
+    "href": "text-analysis.html#sec-text-project-extract-text-example-code",
+    "title": "2  Text Analysis Project",
+    "section": "6.3 Example Code",
+    "text": "6.3 Example Code\nBelow is sample code to help with text extraction:\nlibrary(rvest)\n\nurl &lt;- \"https://example.com/news/article\"\n\npage &lt;- read_html(url)\n\narticle_text &lt;- page |&gt;\n  html_elements(\"p\") |&gt;\n  html_text2() |&gt;\n  paste(collapse = \" \")\n\narticle_text\n\n\n\n\n\n\nTipWriting Functions\n\n\n\nInstead of repeating this code for each article, create a function that takes a URL and returns the article text. This will allow the same process to be applied across all article URLs.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-extract-text-test-one-article",
+    "href": "text-analysis.html#sec-text-project-extract-text-test-one-article",
+    "title": "2  Text Analysis Project",
+    "section": "6.4 Test One Article",
+    "text": "6.4 Test One Article\nBefore processing every article, make sure the process works with one URL.\n# Test code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-extract-text-process-all-articles",
+    "href": "text-analysis.html#sec-text-project-extract-text-process-all-articles",
+    "title": "2  Text Analysis Project",
+    "section": "6.5 Process All Articles",
+    "text": "6.5 Process All Articles\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-extract-text-checkpoint",
+    "href": "text-analysis.html#sec-text-project-extract-text-checkpoint",
+    "title": "2  Text Analysis Project",
+    "section": "6.6 Checkpoint",
+    "text": "6.6 Checkpoint\nYou should now have an R data frame containing:\n\nthe original article information;\narticle_id;\nurl; and\narticle_text.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-extract-text-notes",
+    "href": "text-analysis.html#sec-text-project-extract-text-notes",
+    "title": "2  Text Analysis Project",
+    "section": "6.7 Notes",
+    "text": "6.7 Notes\nWere any articles unable to be extracted?\n\nAdd notes here.\n\nDid the extracted text contain unwanted webpage content?\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-update-sqlite-goal",
+    "href": "text-analysis.html#sec-text-project-update-sqlite-goal",
+    "title": "2  Text Analysis Project",
+    "section": "7.1 Goal",
+    "text": "7.1 Goal\nSave the extracted article text back into SQLite.\nThe database should now contain both the original article information and the newly extracted text.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-update-sqlite-tasks",
+    "href": "text-analysis.html#sec-text-project-update-sqlite-tasks",
+    "title": "2  Text Analysis Project",
+    "section": "7.2 Tasks",
+    "text": "7.2 Tasks\n\nWrite the updated data to SQLite.\nConfirm that article_text is stored.\nCheck for articles with missing text.\nConfirm that the number of articles has not changed.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-update-sqlite-working-code",
+    "href": "text-analysis.html#sec-text-project-update-sqlite-working-code",
+    "title": "2  Text Analysis Project",
+    "section": "7.3 Working Code",
+    "text": "7.3 Working Code\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-update-sqlite-sql-skills",
+    "href": "text-analysis.html#sec-text-project-update-sqlite-sql-skills",
+    "title": "2  Text Analysis Project",
+    "section": "7.4 SQL Skills",
+    "text": "7.4 SQL Skills\nThis step is an opportunity to practice working with:\n\nUPDATE\nWHERE\nSELECT",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-update-sqlite-checkpoint",
+    "href": "text-analysis.html#sec-text-project-update-sqlite-checkpoint",
+    "title": "2  Text Analysis Project",
+    "section": "7.5 Checkpoint",
+    "text": "7.5 Checkpoint\nThe articles table should now contain everything needed for the text analysis.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-update-sqlite-notes",
+    "href": "text-analysis.html#sec-text-project-update-sqlite-notes",
+    "title": "2  Text Analysis Project",
+    "section": "7.6 Notes",
+    "text": "7.6 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-prepare-text-goal",
+    "href": "text-analysis.html#sec-text-project-prepare-text-goal",
+    "title": "2  Text Analysis Project",
+    "section": "8.1 Goal",
+    "text": "8.1 Goal\nUse R to transform the article text into a format that can be analyzed.\nDepending on the analysis, this may include:\n\nconverting text to lowercase;\nremoving punctuation;\ntokenizing text;\nremoving stop words; and\ncreating word frequencies.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-prepare-text-tasks",
+    "href": "text-analysis.html#sec-text-project-prepare-text-tasks",
+    "title": "2  Text Analysis Project",
+    "section": "8.2 Tasks",
+    "text": "8.2 Tasks\n\nLoad the article data from SQLite.\nTokenize the article text.\nClean the tokens as needed.\nPreserve article_id so words can be connected to their original articles.\nPrepare an analysis-ready dataset.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-prepare-text-working-code",
+    "href": "text-analysis.html#sec-text-project-prepare-text-working-code",
+    "title": "2  Text Analysis Project",
+    "section": "8.3 Working Code",
+    "text": "8.3 Working Code\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-prepare-text-notes",
+    "href": "text-analysis.html#sec-text-project-prepare-text-notes",
+    "title": "2  Text Analysis Project",
+    "section": "8.4 Notes",
+    "text": "8.4 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-explore-sqlite-goal",
+    "href": "text-analysis.html#sec-text-project-explore-sqlite-goal",
+    "title": "2  Text Analysis Project",
+    "section": "9.1 Goal",
+    "text": "9.1 Goal\nUse the database to practice basic SQL queries before completing the main analysis in R.\nPossible questions include:\n\nHow many articles are in the database?\nWhich articles are from a particular source?\nWhich articles have missing text?\nHow many articles come from each source?\nWhich articles were published during a particular period?\n\nUse R and dbGetQuery() to answer these questions.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-explore-sqlite-working-code",
+    "href": "text-analysis.html#sec-text-project-explore-sqlite-working-code",
+    "title": "2  Text Analysis Project",
+    "section": "9.2 Working Code",
+    "text": "9.2 Working Code\n# Add queries here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-explore-sqlite-sql-skills",
+    "href": "text-analysis.html#sec-text-project-explore-sqlite-sql-skills",
+    "title": "2  Text Analysis Project",
+    "section": "9.3 SQL Skills",
+    "text": "9.3 SQL Skills\nPractice using:\n\nSELECT\nWHERE\nCOUNT()\nGROUP BY\nORDER BY",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-explore-sqlite-notes",
+    "href": "text-analysis.html#sec-text-project-explore-sqlite-notes",
+    "title": "2  Text Analysis Project",
+    "section": "9.4 Notes",
+    "text": "9.4 Notes\n\nAdd notes here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-conduct-analysis-goal",
+    "href": "text-analysis.html#sec-text-project-conduct-analysis-goal",
+    "title": "2  Text Analysis Project",
+    "section": "10.1 Goal",
+    "text": "10.1 Goal\nUse R to conduct the main text analysis.\nPossible analyses include:\n\nword frequencies;\nlexicon analysis;\nsentiment analysis;\nbigrams or n-grams;\ncomparisons between sources;\ncomparisons across time; and\nother text-mining methods relevant to the research question.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-conduct-analysis-retrieve-the-data",
+    "href": "text-analysis.html#sec-text-project-conduct-analysis-retrieve-the-data",
+    "title": "2  Text Analysis Project",
+    "section": "10.2 Retrieve the Data",
+    "text": "10.2 Retrieve the Data\nStart by retrieving the necessary data from SQLite.\n# Add code here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-conduct-analysis-analysis",
+    "href": "text-analysis.html#sec-text-project-conduct-analysis-analysis",
+    "title": "2  Text Analysis Project",
+    "section": "10.3 Analysis",
+    "text": "10.3 Analysis\n# Add analysis here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-conduct-analysis-visualizations",
+    "href": "text-analysis.html#sec-text-project-conduct-analysis-visualizations",
+    "title": "2  Text Analysis Project",
+    "section": "10.4 Visualizations",
+    "text": "10.4 Visualizations\n# Add visualizations here",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-conduct-analysis-findings",
+    "href": "text-analysis.html#sec-text-project-conduct-analysis-findings",
+    "title": "2  Text Analysis Project",
+    "section": "10.5 Findings",
+    "text": "10.5 Findings\n\nAdd preliminary findings here.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-final-report-goal",
+    "href": "text-analysis.html#sec-text-project-final-report-goal",
+    "title": "2  Text Analysis Project",
+    "section": "11.1 Goal",
+    "text": "11.1 Goal\nCreate a polished Quarto document presenting the results of the text analysis.\nThis working guide documents how the analysis was completed.\nThe final Quarto report communicates what the analysis found.\nThe final report may include:\n\nresearch question;\ndata sources;\nmethodology;\ndescription of the articles;\ntext-processing methods;\ntext-analysis results;\nvisualizations;\ninterpretation;\nlimitations; and\nconclusions.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-checklist-data-preparation",
+    "href": "text-analysis.html#sec-text-project-checklist-data-preparation",
+    "title": "2  Text Analysis Project",
+    "section": "15.1 Data Preparation",
+    "text": "15.1 Data Preparation\n\nImported the original Excel file into R.\nConfirmed that one row represents one article.\nChecked for missing or duplicate URLs.\nCreated a unique article_id.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-checklist-sqlite-database",
+    "href": "text-analysis.html#sec-text-project-checklist-sqlite-database",
+    "title": "2  Text Analysis Project",
+    "section": "15.2 SQLite Database",
+    "text": "15.2 SQLite Database\n\nConnected R to SQLite.\nCreated the SQLite database.\nStored the article data in an articles table.\nConfirmed that the database contains the expected number of records.\nRetrieved data from SQLite into R.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-checklist-article-text",
+    "href": "text-analysis.html#sec-text-project-checklist-article-text",
+    "title": "2  Text Analysis Project",
+    "section": "15.3 Article Text",
+    "text": "15.3 Article Text\n\nTested article-text extraction using one URL.\nExtracted text from all possible articles.\nIdentified any failed article extractions.\nCreated an article_text variable.\nUpdated the SQLite database with the extracted text.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-checklist-sql-practice",
+    "href": "text-analysis.html#sec-text-project-checklist-sql-practice",
+    "title": "2  Text Analysis Project",
+    "section": "15.4 SQL Practice",
+    "text": "15.4 SQL Practice\n\nUsed SELECT to retrieve data.\nUsed WHERE to filter records.\nUsed COUNT() to count records.\nUsed GROUP BY to summarize groups.\nUsed ORDER BY to sort query results.\nUsed UPDATE or another database-writing method to update stored data.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-checklist-text-analysis",
+    "href": "text-analysis.html#sec-text-project-checklist-text-analysis",
+    "title": "2  Text Analysis Project",
+    "section": "15.5 Text Analysis",
+    "text": "15.5 Text Analysis\n\nRetrieved the necessary data from SQLite.\nCleaned and tokenized the article text.\nConducted the selected text analyses.\nCreated appropriate visualizations.\nDocumented the main findings.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-checklist-final-output",
+    "href": "text-analysis.html#sec-text-project-checklist-final-output",
+    "title": "2  Text Analysis Project",
+    "section": "15.6 Final Output",
+    "text": "15.6 Final Output\n\nProduced a reproducible Quarto report.\nDocumented important problems and decisions.\nConfirmed that the workflow can be repeated with a new collection of documents.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-key-functions-excel-and-data-import",
+    "href": "text-analysis.html#sec-text-project-key-functions-excel-and-data-import",
+    "title": "2  Text Analysis Project",
+    "section": "16.1 Excel and Data Import",
+    "text": "16.1 Excel and Data Import\n\n\n\nFunction\nPurpose\n\n\n\n\nread_excel()\nImport an Excel file into R\n\n\nhead()\nView the first rows of a dataset\n\n\nstr()\nInspect the structure of a dataset\n\n\nnrow()\nCount the number of rows\n\n\nduplicated()\nCheck for duplicate values\n\n\nis.na()\nCheck for missing values",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-key-functions-connecting-r-to-sqlite",
+    "href": "text-analysis.html#sec-text-project-key-functions-connecting-r-to-sqlite",
+    "title": "2  Text Analysis Project",
+    "section": "16.2 Connecting R to SQLite",
+    "text": "16.2 Connecting R to SQLite\n\n\n\nFunction\nPurpose\n\n\ndbConnect()\nConnect R to a database\n\n\nSQLite()\nTell R to use SQLite\n\n\ndbDisconnect()\nClose the database connection\n\n\ndbListTables()\nList the tables stored in the database",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-key-functions-reading-and-writing-database-data",
+    "href": "text-analysis.html#sec-text-project-key-functions-reading-and-writing-database-data",
+    "title": "2  Text Analysis Project",
+    "section": "16.3 Reading and Writing Database Data",
+    "text": "16.3 Reading and Writing Database Data\n\n\n\nFunction\nPurpose\n\n\ndbWriteTable()\nWrite an R data frame to SQLite\n\n\ndbReadTable()\nRead an entire SQLite table into R\n\n\ndbGetQuery()\nSend a SQL query to SQLite and return the results\n\n\ndbExecute()\nSend a SQL command that changes the database",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-key-functions-basic-sql-commands",
+    "href": "text-analysis.html#sec-text-project-key-functions-basic-sql-commands",
+    "title": "2  Text Analysis Project",
+    "section": "16.4 Basic SQL Commands",
+    "text": "16.4 Basic SQL Commands\n\n\n\nCommand\nPurpose\n\n\nSELECT\nChoose columns or values to retrieve\n\n\nFROM\nIdentify the table being queried\n\n\nWHERE\nFilter records\n\n\nCOUNT()\nCount records\n\n\nGROUP BY\nGroup records before summarizing\n\n\nORDER BY\nSort query results\n\n\nUPDATE\nChange existing records\n\n\nIS NULL\nIdentify missing database values",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-key-functions-web-scraping",
+    "href": "text-analysis.html#sec-text-project-key-functions-web-scraping",
+    "title": "2  Text Analysis Project",
+    "section": "16.5 Web Scraping",
+    "text": "16.5 Web Scraping\n\n\n\nFunction\nPurpose\n\n\nread_html()\nRead the HTML from a webpage\n\n\nhtml_elements()\nSelect elements from a webpage\n\n\nhtml_text2()\nExtract text from selected HTML elements",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "text-analysis.html#sec-text-project-key-functions-text-analysis",
+    "href": "text-analysis.html#sec-text-project-key-functions-text-analysis",
+    "title": "2  Text Analysis Project",
+    "section": "16.6 Text Analysis",
+    "text": "16.6 Text Analysis\n\n\n\nFunction / Package\nPurpose\n\n\nunnest_tokens()\nBreak text into individual words or tokens\n\n\nanti_join()\nRemove stop words or other unwanted matches\n\n\ncount()\nCount words or other values\n\n\nget_sentiments()\nLoad a sentiment lexicon\n\n\ninner_join()\nMatch words with a sentiment lexicon\n\n\nggplot()\nCreate visualizations",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Text Analysis Project</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#current-chapters",
+    "href": "index.html#current-chapters",
+    "title": "Using SQL in R",
+    "section": "Current Chapters",
+    "text": "Current Chapters\n\n@sec-databases-sql-r\nThis chapter provides an introduction to databases, SQL, and SQLite within R. It covers the fundamentals of connecting to databases, exploring and querying tables, creating databases from existing files, and using SQL alongside familiar R workflows.\n\n\n2  Text Analysis Project\nThis chapter applies these concepts to a working text-analysis project. Students move from an existing Excel file to a SQLite database, extract article text using R, practice SQL throughout the workflow, and prepare the resulting data for text analysis and a final Quarto report.",
+    "crumbs": [
+      "About This Guide"
+    ]
+  }
+]
