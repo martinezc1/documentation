@@ -237,13 +237,9 @@ install.packages(c(
 There are many database systems, including:
 
 - SQLite
-
 - PostgreSQL
-
 - MySQL
-
 - Microsoft SQL Server
-
 - Oracle
 
 For learning SQL, SQLite is particularly useful because the entire database can be stored in **one file**.
