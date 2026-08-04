@@ -18,9 +18,8 @@ flowchart LR
     A[Excel] --> B[R]
     B --> C[SQLite Database]
     C --> D[R: Extract Text]
-    D --> E[SQLite Database]
-    E --> F[R: Text Analysis]
-    F --> G[Quarto Report]
+    D --> E[Update SQLite Database]
+    E --> F[R: Prepare Text]
 ```
 
 The goal is to create a workflow that can be reused for future text-analysis projects.
@@ -341,69 +340,6 @@ Practice using:
 
 > Add notes here.
 
-## Conduct the Text Analysis {#sec-text-project-conduct-analysis}
-
-### Goal {#sec-text-project-conduct-analysis-goal}
-
-Use R to conduct the main text analysis.
-
-Possible analyses include:
-
-- word frequencies
-- lexicon analysis
-- sentiment analysis
-- bigrams or n-grams
-- comparisons between sources
-- comparisons across time
-- other text-mining methods relevant to the research question
-
-### Retrieve the Data {#sec-text-project-conduct-analysis-retrieve-the-data}
-
-Start by retrieving the necessary data from SQLite.
-
-```         
-# Add code here
-```
-
-### Analysis {#sec-text-project-conduct-analysis-analysis}
-
-```         
-# Add analysis here
-```
-
-### Visualizations {#sec-text-project-conduct-analysis-visualizations}
-
-```         
-# Add visualizations here
-```
-
-### Findings {#sec-text-project-conduct-analysis-findings}
-
-> Add preliminary findings here.
-
-## Produce the Final Quarto Report {#sec-text-project-final-report}
-
-### Goal {#sec-text-project-final-report-goal}
-
-Create a polished Quarto document presenting the results of the text analysis.
-
-This working guide documents **how the analysis was completed**.
-
-The final Quarto report communicates **what the analysis found**.
-
-The final report may include:
-
-- research question
-- data sources
-- methodology
-- description of the articles
-- text-processing methods
-- text-analysis results
-- visualizations
-- interpretation
-- limitations
-- conclusions
-
 ## Final Checklist {#sec-text-project-final-checklist}
 
 By the end of the project, you should be able to:
@@ -416,8 +352,6 @@ By the end of the project, you should be able to:
 - [ ] Extract article text from URLs.
 - [ ] Update the database with new information.
 - [ ] Prepare text for analysis.
-- [ ] Conduct text analysis in R.
-- [ ] Produce a reproducible Quarto report.
 
 ## Final Workflow {#sec-text-project-final-workflow}
 
@@ -429,8 +363,6 @@ flowchart TD
     D --> E[Extract Article Text]
     E --> F[Update SQLite Database]
     F --> G[Retrieve Data into R]
-    G --> H[Text Analysis]
-    H --> I[Quarto Report]
 ```
 
 The goal is not only to complete this analysis, but to understand the workflow well enough to repeat it with a new collection of documents in the future.
@@ -445,8 +377,6 @@ The goal is not only to complete this analysis, but to understand the workflow w
 - Article text can be extracted in R and then written back to the SQLite database.
 - SQL is useful for filtering, counting, grouping, and retrieving data before analysis.
 - R remains the primary tool for text cleaning, tokenization, sentiment analysis, visualization, and other text-mining tasks.
-- Quarto can be used to document the entire workflow and produce the final analysis.
-- The overall workflow can be reused with future collections of articles or other documents.
 
 ## Checklist {#sec-text-project-checklist}
 
@@ -481,20 +411,6 @@ The goal is not only to complete this analysis, but to understand the workflow w
 - [ ] Used `GROUP BY` to summarize groups.
 - [ ] Used `ORDER BY` to sort query results.
 - [ ] Used `UPDATE` or another database-writing method to update stored data.
-
-### Text Analysis {#sec-text-project-checklist-text-analysis}
-
-- [ ] Retrieved the necessary data from SQLite.
-- [ ] Cleaned and tokenized the article text.
-- [ ] Conducted the selected text analyses.
-- [ ] Created appropriate visualizations.
-- [ ] Documented the main findings.
-
-### Final Output {#sec-text-project-checklist-final-output}
-
-- [ ] Produced a reproducible Quarto report.
-- [ ] Documented important problems and decisions.
-- [ ] Confirmed that the workflow can be repeated with a new collection of documents.
 
 ## Key Functions and Commands {#sec-text-project-key-functions}
 
@@ -551,15 +467,3 @@ The goal is not only to complete this analysis, but to understand the workflow w
 | `read_html()`     | Read the HTML from a webpage             |
 | `html_elements()` | Select elements from a webpage           |
 | `html_text2()`    | Extract text from selected HTML elements |
-
-### Text Analysis {#sec-text-project-key-functions-text-analysis}
-
-|                    |                                             |
-|--------------------|---------------------------------------------|
-| Function / Package | Purpose                                     |
-| `unnest_tokens()`  | Break text into individual words or tokens  |
-| `anti_join()`      | Remove stop words or other unwanted matches |
-| `count()`          | Count words or other values                 |
-| `get_sentiments()` | Load a sentiment lexicon                    |
-| `inner_join()`     | Match words with a sentiment lexicon        |
-| `ggplot()`         | Create visualizations                       |
