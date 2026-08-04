@@ -509,7 +509,7 @@ The goal is not only to complete this analysis, but to understand the workflow w
 | `duplicated()` | Check for duplicate values         |
 | `is.na()`      | Check for missing values           |
 
-## Connecting R to SQLite {#sec-text-project-key-functions-connecting-r-to-sqlite}
+### Connecting R to SQLite {#sec-text-project-key-functions-connecting-r-to-sqlite}
 
 |                  |                                        |
 |------------------|----------------------------------------|
