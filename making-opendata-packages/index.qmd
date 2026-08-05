@@ -1,0 +1,97 @@
+# About {.unnumbered}
+
+Welcome to **The OpenData Package Developer's Guide**!
+
+Thank you for your interest in contributing to the OpenData ecosystem in R. The goal of this project is simple: make municipal open data easier to access, analyze, and teach by providing lightweight, user-friendly R packages built on a common framework.
+
+By the end of this guide, you will have everything needed to create a fully functional OpenData package for a new city, complete with documentation, testing, a package website, and a reproducible workflow for developing and maintaining future OpenData packages.
+
+## Why OpenData Packages?
+
+Many cities publish enormous amounts of valuable public data through Socrata-powered Open Data portals. While these datasets are freely available, accessing them typically requires users to understand APIs, JSON endpoints, and the Socrata Query Language (SoQL).
+
+OpenData packages remove much of that technical overhead by allowing users to interact with public datasets through familiar R functions. This makes civic data more approachable for students, researchers, journalists, educators, and anyone interested in working with public information.
+
+## Why Is This Important?
+
+Every new OpenData package lowers the barrier to working with public data. Whether the package is used in a classroom, a newsroom, a research lab, or by residents exploring their own communities, each contribution helps make civic data more accessible and reproducible.
+
+## History
+
+In Fall 2025, while teaching **Reproducible Research Using R** in the M.S. in Psychological Research program at Brooklyn College (CUNY), I found myself facing an unexpected problem.
+
+Initially, the course relied on traditional teaching datasets such as `mtcars`. While useful for learning R, these datasets lacked personal relevance for many students. To make coursework more engaging, the course shifted toward using live datasets from the NYC Open Data Portal, allowing students to investigate questions about their own communities using continuously updated public data.
+
+To remove the technical barriers associated with working with APIs, the **nycOpenData** package was developed. Rather than requiring students to learn API syntax before analyzing data, the package allowed them to begin exploring NYC datasets immediately using simple R functions.
+
+Since then, **nycOpenData** has undergone peer review and been accepted into the **rOpenSci** ecosystem. The same architecture has since been used to develop additional OpenData packages for other Socrata-powered portals.
+
+## Current Landscape
+
+The OpenData ecosystem continues to grow. Currently, the following packages are available on CRAN:
+
+| Package                      | Coverage                              |
+|------------------------------|---------------------------------------|
+| `nycOpenData` @R-nycOpenData | New York City                         |
+| `nysOpenData` @R-nysOpenData | New York State                        |
+| `mtaOpenData` @R-mtaOpenData | Metropolitan Transportation Authority |
+| `laOpenData` @R-laOpenData   | Los Angeles                           |
+| `chiOpenData` @R-chiOpenData | Chicago                               |
+
+Together, these packages provide convenient access to tens of billions of rows of publicly available data spanning transportation, public safety, health, education, housing, the environment, and many other domains.
+
+As additional packages are developed, this ecosystem will continue expanding to make municipal Open Data more accessible across the United States.
+
+Each package shares a common architecture, allowing contributors to develop additional city-specific packages using the same reproducible workflow described throughout this guide.
+
+## Who Is This Guide For?
+
+This guide is intended for anyone interested in creating a new OpenData package for a Socrata-powered Open Data portal.
+
+While some familiarity with R package development is helpful, this guide does **not** attempt to teach:
+
+- R programming
+
+- API development
+
+- SoQL
+
+- General R package development
+
+Instead, it focuses specifically on adapting the existing OpenData framework to a new city, allowing contributors to build consistent, maintainable packages without starting from scratch.
+
+This guide is especially useful for:
+
+- R package developers
+
+- Students contributing to the OpenData ecosystem
+
+- Civic technologists
+
+- Researchers working with municipal data
+
+- Contributors interested in expanding the OpenData package collection
+
+## How to Use This Guide
+
+The chapters in this guide are designed to be completed sequentially.
+
+For each script you will:
+
+1.  Understand its role within the package.
+
+2.  Learn what needs to be customized.
+
+3.  Verify that your changes work correctly.
+
+4.  Review common pitfalls.
+
+5.  Complete a checklist before moving to the next chapter.
+
+Following this workflow ensures that every package built from the template follows the same architecture, quality standards, and user experience—making the OpenData ecosystem easier to maintain, expand, and use.
+
+## License
+
+Unless otherwise noted, the written content of this guide is licensed under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
+
+Original code examples, scripts, and reusable package templates are licensed under the MIT License. See the repository's `LICENSE.md` file for complete licensing information.

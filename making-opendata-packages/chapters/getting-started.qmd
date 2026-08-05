@@ -1,0 +1,211 @@
+# Getting Started
+
+Before customizing the OpenData template, you'll need a working R package project connected to GitHub. This chapter walks through creating a new package, connecting it to a GitHub repository, and preparing it to use the OpenData template.
+
+## Creating a New Package
+
+In RStudio, select File → New Project. Then:
+
+1.  Choose **New Directory**.
+
+2.  Select **R Package**.
+
+3.  Enter a package name.
+
+4.  Choose the directory where the package should be created.
+
+5.  Click **Create Project**.
+
+::: {callout-tip}
+### Making Things Easier:
+
+If Git is installed on your computer, you may also see an option to Create a git repository. Checking this box will automatically initialize Git for the project, allowing you to skip Step 2 below.
+:::
+
+## Connecting to GitHub
+
+Version control is an essential part of modern R package development. Throughout this guide, Git and GitHub are used to track changes, collaborate with others, host package source code, and publish package websites using GitHub Pages.
+
+Fortunately, only a small subset of Git functionality is needed to build an OpenData package.
+
+::: {.callout-tip}
+#### Here are the steps in order. A more thorough explanation is provided as well.
+
+1. Create repository
+2. git init
+3. git status
+4. git remote add origin https://github.com/USERNAME/nycOpenData.git
+5. git remote -v
+6. git add .
+7. git commit -m "Initial package template"
+8. git branch -M main
+9. git push -u origin main
+
+:::
+
+### Step 1: Create a GitHub Repository
+
+Begin by logging into GitHub and creating a new repository.
+
+When creating the repository:
+
+- Give the repository the same name as your package (for example, `nycOpenData`).
+
+- Keep the repository **Public** if you plan to share the package.
+
+- Do **not** initialize the repository with a README, `.gitignore`, or license if you already created the package locally. These files already exist in your package.
+
+Once the repository has been created, copy its URL.
+
+For example:
+
+``` text
+https://github.com/USERNAME/nycOpenData.git
+```
+
+### Step 2: Initialize Git
+
+Open your package project in RStudio.
+
+If Git was not enabled when the project was created, initialize it from the Terminal:
+
+``` text
+git init
+```
+
+Then verify Git is active:
+
+``` text
+git status
+```
+
+### Step 3: Connect the Local Package to GitHub
+
+Add the GitHub repository as the remote origin.
+
+``` text
+git remote add origin https://github.com/USERNAME/nycOpenData.git
+```
+
+Verify the connection:
+
+``` text
+git remote -v
+```
+
+You should now see the GitHub repository listed as the remote.
+
+### Step 4: Make Your First Commit
+
+Stage every file:
+
+``` text
+git add .
+```
+
+Commit them:
+
+``` text
+git commit -m "Initial package template"
+```
+
+### Step 5: Push to GitHub
+
+Push the package to GitHub
+
+``` text
+git branch -M main
+git push -u origin main
+```
+
+After refreshing GitHub, your package should now appear online.
+
+### Daily Workflow
+
+After the initial setup, the Git workflow is very simple.
+
+Whenever you finish making changes:
+
+``` text
+git add .
+git commit -m "Describe what changed"
+git push
+```
+
+Most OpenData package development only requires these three commands.
+
+At this point, your package structure is complete and connected to GitHub. The final step is to replace the default package files with the OpenData template.
+
+### Updating an Existing Package
+
+If you already cloned a package from GitHub and someone else has made changes, download the latest updates before beginning your work.
+
+``` text
+git pull
+```
+
+### Quick Reference
+
+| Command                   | Purpose                          |
+|---------------------------|----------------------------------|
+| `git init`                | Initialize Git for a project     |
+| `git status`              | View changed files               |
+| `git add .`               | Stage all changes                |
+| `git commit -m "message"` | Save a snapshot of your changes  |
+| `git push`                | Upload changes to GitHub         |
+| `git pull`                | Download the latest changes      |
+| `git remote -v`           | View connected GitHub repository |
+
+### Common Pitfalls
+
+- Forgetting to commit changes before pushing.
+
+- Forgetting to pull the latest changes before starting work.
+
+- Creating the GitHub repository with a README when the package already contains one.
+
+- Accidentally working in the wrong repository.
+
+- Using vague commit messages such as `"update"` instead of describing what actually changed.
+
+## Using the Template
+
+Once the package has been created and connected to GitHub, download the latest version of the OpenData template.
+
+The template contains the core files needed to build an OpenData package, including:
+
+- `city_list_datasets.R`
+
+- `city_pull_dataset.R`
+
+- `city_any_dataset.R`
+
+- `utils_request.R`
+
+- tests
+
+- documentation
+
+- package metadata
+
+Copy these files into your package, replacing the placeholder files created by RStudio.
+
+After copying the template, run:
+
+``` text
+devtools::document()
+```
+
+to regenerate the package documentation before beginning the customization chapters.
+
+## Chapter Checklist
+
+Before continuing, confirm that you have:
+
+- [ ] Created a new R package.
+- [ ] Initialized Git.
+- [ ] Connected the package to GitHub.
+- [ ] Successfully pushed the initial commit.
+- [ ] Verified the repository appears on GitHub.
+- [ ] Downloaded the OpenData template.
+- [ ] Copied the template into your package.

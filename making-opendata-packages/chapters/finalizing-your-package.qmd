@@ -1,0 +1,240 @@
+# Finalizing Your Package
+
+At this point, the package's core functionality is complete. However, a high-quality R package consists of much more than its R scripts. This chapter walks through the remaining files that should be reviewed before submitting the package to CRAN or sharing it with others.
+
+## Package Metadata
+
+There are several documents that make up the metadata regarding the package itself. These include the following.
+
+### Description
+
+The `DESCRIPTION` file serves as the package's identity card. It contains metadata used by CRAN, GitHub, and other R tooling to describe the package and its dependencies.
+
+#### Commonly Updated Fields
+
+- **Package** – The name of your package.
+
+- **Title** – A short, descriptive title explaining the purpose of the package.
+
+- **Version** – The current version number of the package, updated with each release.
+
+- **Authors** – The names and roles of the package authors and contributors.
+
+- **Description** – A more detailed explanation of what the package does and who it is for.
+
+- **URL** – Links to the package website, GitHub repository, or other relevant resources.
+
+- **BugReports** – The URL where users can report issues or bugs.
+
+- **Imports** – Packages that your package depends on to function correctly.
+
+- **Suggests** – Packages used for optional features such as testing, examples, or vignettes.
+
+#### Fields That Are Usually Left Unchanged
+
+- **Type** – Specifies the package type, which will almost always be `"Package"`.
+
+- **Encoding** – Defines the text encoding used by the package, typically `"UTF-8"`.
+
+- **RoxygenNote** – Records the version of **roxygen2** used to generate the documentation.
+
+- **Depends** – Lists packages that users must attach when loading your package, though `Imports` is generally preferred.
+
+- **VignetteBuilder** – Specifies the package used to build the package vignettes.
+
+- **Config/testthat/edition** – Indicates the version of **testthat** used for the package's testing framework.
+
+### Namespace
+
+This is a file that is usually generated automatically by roxygen2 (when you run `devtools::document()`). You should almost *never* edit this file manually.
+
+## Documentation
+
+### License
+
+This is telling the community how they can work with this package. Unless you are changing the package's licensing model, this file is typically created once and rarely modified.
+
+### News
+
+This is a place to put any news regarding any changes/updates that have been made to the package. This should most likely be updated with every version update. For example, if you update the package from 0.1.0 to 0.1.1, then the changes should be described in News.
+
+### README
+
+The README is often the first thing users see when visiting the package's GitHub repository. A good README should explain what the package does, how to install it, and include several working examples.
+
+For a package, there will be two README files:
+
+1.  README.Rmd
+2.  README.md
+
+The .Rmd file is a traditional R Markdown file, while the .md file is the rendered version of the .Rmd file. Typically, you would edit the .Rmd file, render the output, and the .md file would automatically update.
+
+Although not required by CRAN, a README is strongly recommended because it serves as the primary landing page for users visiting the package on GitHub.
+
+Additionally, this will become critical if creating a webpage, such as pkgdown, for the package.
+
+::: callout-tip
+#### New to R Markdown or Quarto?
+
+This guide assumes a basic familiarity with R Markdown and Quarto. Readers looking for a more comprehensive introduction to reproducible workflows, literate programming, and document publishing may find *Reproducible Research Using R* a helpful companion resource @Martinez2026ReproducibleResearch.
+:::
+
+### Vignettes
+
+Vignettes are long-form tutorials that demonstrate how to use your package in realistic workflows. Unlike individual function documentation, which explains a single function, vignettes show how multiple functions work together to solve a problem.
+
+For an OpenData package, a vignette is an excellent place to demonstrate a complete workflow, such as:
+
+- Listing available datasets with `city_list_datasets()`
+
+- Downloading a dataset using `city_pull_dataset()`
+
+- Filtering observations
+
+- Working with date ranges
+
+- Performing a simple analysis or visualization
+
+Well-written vignettes help new users become productive more quickly and provide examples that are often more comprehensive than those included in individual function documentation.
+
+By default, vignettes are stored in the package's `vignettes/` directory and are automatically included in the pkgdown website.
+
+**It is strongly encouraged all OpenData packages have *at least* one vignette.**
+
+::: callout-tip
+#### Keep vignettes reproducible
+
+Because vignettes are intended to be run by users, avoid examples that depend on temporary datasets, hard-coded file paths, or values that frequently change. Whenever possible, use stable datasets and limit the number of rows downloaded so the vignette runs quickly while still demonstrating the package's functionality.
+:::
+
+### pkgdown Website
+
+One of the easiest ways to make an R package look professional is by creating a **pkgdown** website. A pkgdown website automatically converts your package documentation into a searchable website, making it easier for users to browse functions, read vignettes, and learn how to use your package.
+
+When hosted through **GitHub Pages**, the website serves as the public-facing homepage for your package. Rather than navigating individual help files, users can access reference documentation, installation instructions, articles, and examples from a single location.
+
+A typical pkgdown website includes:
+
+- A homepage generated from the package `README.md`
+
+- Reference pages for every exported function
+
+- Vignettes and tutorials
+
+- News and release notes from `NEWS.md`
+
+- Links to the package source code, issue tracker, and documentation
+
+For many users, the pkgdown website will be their first interaction with your package. Spending time to create a clear homepage and well-written function documentation can greatly improve the usability of the package.
+
+::: callout-tip
+#### Rebuild your website after making changes
+
+Whenever you update your package documentation, README, or vignettes, remember to rebuild the pkgdown website so the online documentation stays synchronized with the package. If you are using pkgdown, this can typically be done with:
+
+- `pkgdown::build_site()`
+:::
+
+## Quick File Reference
+
+Below is a table with information regarding the individual files:
+
+| File             | Usually Edited?   | Notes                             |
+|------------------|-------------------|-----------------------------------|
+| DESCRIPTION      | ✅ Yes            | Update metadata                   |
+| NAMESPACE        | ❌ No             | Generated automatically           |
+| README.Rmd       | ✅ Yes            | Main documentation                |
+| README.md        | ⚙️ Auto-generated | Don't edit directly               |
+| NEWS.md          | ✅ Yes            | Version history                   |
+| LICENSE          | ⚠️ Once           | Usually doesn't change            |
+| cran-comments.md | 📝 Only for CRAN  | Submission notes                  |
+| CRAN-SUBMISSION  | 🤖 Auto-generated | Ignore during development         |
+| **vignettes/**   | ✅ Yes            | Long-form tutorials and workflows |
+
+## Common Pitfalls
+
+Making a package is a lot of work. Here are some of the things to look out for:
+
+- Editing README.md instead of README.Rmd
+
+- Editing NAMESPACE manually
+
+- Forgetting to run document()
+
+- Forgetting to bump the version
+
+- Forgetting to update NEWS.md
+
+- Using stale URLs
+
+- Forgetting to rebuild pkgdown
+
+::: callout-tip
+### Don't try to perfect everything at once
+
+Most package development is iterative.
+
+Get the package working first, then improve the documentation, website, examples, and testing over time.
+:::
+
+## Before Submitting
+
+The final steps before making the package public, whether to GitHub or CRAN, are as follows.
+
+### Testing
+
+Before publishing your package, run the following commands in order:
+
+1.  `devtools::document()`: Regenerates documentation and updates NAMESPACE.
+2.  `devtools::test()`: Runs the package's automated tests.
+3.  `devtools::check()`: Simulates CRAN checks to identify problems before submission.
+
+### Before Publishing
+
+In the cases when you are re-publishing your package after having made some updates, here are things to look out for:
+
+- [ ] DESCRIPTION updated
+- [ ] README rebuilt
+- [ ] Documentation rebuilt
+- [ ] NEWS updated
+- [ ] Website rebuilt
+- [ ] Tests pass
+- [ ] `devtools::check()` passes
+- [ ] No NOTES
+- [ ] Version number updated
+- [ ] Package website deployed (if using pkgdown)
+- [ ] GitHub repository updated
+- [ ] CRAN comments prepared (if submitting to CRAN)
+- [ ] Vignettes rebuilt and tested.
+
+### Final Workflow
+
+```{mermaid}
+flowchart LR
+A[Customize Template]
+--> B[Test Package]
+--> C[Update Documentation]
+--> D[Build Website]
+--> E[Run devtools::check()]
+--> F[Publish]
+```
+
+### Submitting to CRAN
+
+When everything is all said and done, and you are ready to submit to cran, you can use the following command:
+
+- `devtools::release()`
+
+`devtools::release()` guides you through a series of checks before preparing the package for submission. Once the checks pass, you'll be prompted to answer a few questions and then directed to submit the package to CRAN. After submission, you'll receive a confirmation email from CRAN, and a reviewer will either accept the package or contact you with any requested changes.
+
+## Congratulations
+
+Congratulations! At this point, you have customized the package template, updated the documentation, tested the package, and prepared it for publication.
+
+Whether you choose to share your package through GitHub, submit it to CRAN, or contribute it to a larger ecosystem such as **rOpenSci**, you now have a reproducible framework for creating Open Data packages that can be maintained and expanded over time.
+
+The remaining chapters provide additional reference material and resources that may be helpful as you continue developing your package.
+
+## Thank You!
+
+Thank you for contributing to the OpenData ecosystem. Every new package makes public data more accessible to researchers, students, educators, journalists, and the communities these datasets represent.

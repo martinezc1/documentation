@@ -1,0 +1,42 @@
+project:
+  type: book
+
+book:
+  title: "The OpenData Package Developer's Guide"
+  author: "Christian Martinez"
+  date: "7/14/2026"
+  chapters:
+    - index.qmd
+    - chapters/getting-started.qmd
+    - chapters/packages.qmd
+    - chapters/utils_request.qmd
+    - chapters/city_list_datasets.qmd
+    - chapters/city_pull_dataset.qmd
+    - chapters/city_any_dataset.qmd
+    - chapters/finalizing-your-package.qmd
+    - chapters/citation.qmd
+  appendices:
+    - chapters/template-city-list-dataset.qmd
+    - chapters/template-city-pull-dataset.qmd
+    - chapters/template-city-any-dataset.qmd
+    - chapters/template-utils-requests.qmd
+    - chapters/template-description.qmd
+    - chapters/template-readme.qmd
+    - chapters/template-vignette.qmd
+
+bibliography: references.bib
+
+license: "CC BY 4.0"
+
+format:
+  html:
+    theme:
+      - flatly
+      - brand
+    code-copy: true
+    code-summary: "Show the code"
+    toc: true
+    number-sections: true
+
+editor: visual
+

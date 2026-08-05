@@ -1,0 +1,135 @@
+# `city_pull_dataset()`
+
+## Introduction
+
+With `city_list_datasets()` complete, we can now customize `city_pull_dataset()`. This is the primary function users will interact with when using the package. Its purpose is to download individual datasets from the city's Open Data Portal.
+
+```{mermaid}
+flowchart TD
+A[User provides key or UID] --> B[Search metadata catalog]
+B --> C[Retrieve dataset UID]
+C --> D[Build SoQL query]
+D --> E[Download dataset]
+E --> F[Return tibble]
+```
+
+Unlike `city_list_datasets()`, which retrieves metadata describing every dataset on the portal, `city_pull_dataset()` retrieves the actual records from a single dataset selected by the user.
+
+::: callout-tip
+## `city_pull_dataset()` depends on `city_list_datasets()`
+
+This function first looks up the requested dataset in the metadata catalog returned by `city_list_datasets()`. It then retrieves the corresponding Socrata UID before downloading the dataset itself.
+:::
+
+## What Needs to Change
+
+### Code Changes
+
+Very little of the underlying function needs to change from city to city.
+
+Verify the following:
+
+- **UID column**
+
+  The function assumes the metadata catalog contains a column named `uid`. If your city's metadata catalog instead uses `id`, update every reference to `.data$uid` accordingly.
+
+### Documentation Changes
+
+Most of the customization for `city_pull_dataset()` occurs in the documentation examples rather than the function itself. Be sure to update:
+
+- every placeholder dataset UID
+- every placeholder dataset key
+- every placeholder field name
+- every placeholder filter value
+- every placeholder date field
+- every `ORDER BY` example
+- every example so it executes successfully on the city's Open Data Portal
+
+## Choosing an Example Dataset
+
+Select one dataset from the portal that:
+
+- is publicly accessible
+
+- contains at least several hundred rows
+
+- has one or more character fields suitable for filtering
+
+- contains at least one date or datetime column
+
+- is unlikely to disappear in the near future
+
+Use this dataset consistently throughout the documentation examples.
+
+::: callout-tip
+## Use a real dataset in every example
+
+Avoid creating artificial examples whenever possible.
+
+Using a real dataset allows users to copy and paste examples directly into R, making it much easier to verify that the package is working correctly.
+:::
+
+## Verifying Your Results
+
+After making the necessary replacements, verify that:
+
+- [ ] datasets can be pulled by key
+- [ ] datasets can be pulled by UID
+- [ ] filters return the expected rows
+- [ ] date filtering works correctly
+- [ ] ordering works correctly
+- [ ] invalid dataset names produce an informative error
+- [ ] documentation examples execute successfully
+
+## Template Values to Replace
+
+Below is a table on the template values that need to be replaced per the specific city, and what they need to be replaced with.
+
+| Template value | Replace with |
+|----|----|
+| `CITY_NAME` | Full city name |
+| `city_pull_dataset()` | Package-specific function prefix |
+| `city_list_datasets()` | Package-specific function prefix |
+| `city_any_dataset()` | Package-specific function prefix |
+| `.city_catalog_tbl()` | Package-specific internal prefix |
+| `.city_abort()` | Package-specific internal prefix |
+| `.city_build_date_where()` | Package-specific internal prefix |
+| `.city_dataset_request()` | Package-specific internal prefix |
+| `"abcd-1234"` | A real example Socrata UID |
+| `"example_dataset_name"` | The corresponding catalog key |
+| `FILTER_FIELD` and example values | Real columns and values from the example dataset |
+| `DATE_FIELD` | A real date or datetime column |
+| `"VALUE_1"` | Real value from the example dataset |
+| `"VALUE_2"` | Second real value from the example dataset |
+| `"DATE_FIELD DESC"` | A real ordering example |
+
+## Common Pitfalls
+
+When customizing `city_pull_dataset()`, the most common issues are:
+
+- Forgetting to update the example dataset UID after choosing a new dataset.
+- Choosing an example dataset that does not contain a date column, causing the date-filtering examples to fail.
+- Using placeholder field names (such as `FILTER_FIELD` or `DATE_FIELD`) instead of real column names.
+- Using filter values that no longer exist in the example dataset.
+- Selecting a dataset that is updated infrequently or removed from the portal, causing examples to break over time.
+- Updating the documentation but forgetting to update the corresponding examples in the function documentation.
+- Assuming the metadata catalog uses a `uid` column when it actually uses `id`.
+
+## Chapter Checklist
+
+Before continuing, confirm that you have:
+
+- [ ] Updated all package function prefixes.
+- [ ] Verified the metadata UID column.
+- [ ] Selected a real example dataset.
+- [ ] Updated every example UID.
+- [ ] Updated every example key.
+- [ ] Updated every filter field.
+- [ ] Updated every filter value.
+- [ ] Updated every date field.
+- [ ] Updated every ORDER BY example.
+- [ ] Successfully downloaded a dataset using its key.
+- [ ] Successfully downloaded a dataset using its UID.
+- [ ] Verified the documentation examples run successfully.
+- [ ] Verified `clean_names = TRUE` works.
+- [ ] Verified `coerce_types = TRUE` works.

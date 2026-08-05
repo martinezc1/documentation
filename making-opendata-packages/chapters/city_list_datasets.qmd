@@ -1,0 +1,86 @@
+# `city_list_datasets()`
+
+## Introduction
+
+The first script to customize is `city_list_datasets()`. This function retrieves the metadata catalog for a city's Open Data Portal. Rather than downloading a specific dataset, it downloads information about every dataset available on the portal.
+
+This metadata catalog is used throughout the package. It allows users to browse available datasets, search for datasets by name, and reference datasets using either a human-readable key or the official Socrata dataset UID.
+
+Because every Socrata portal structures its metadata catalog slightly differently, this is one of the first scripts that should be customized when creating a new package.
+
+## What Needs to Change
+
+Although the overall workflow remains the same for every package, each city's metadata catalog is structured slightly differently. Before moving on, verify the following components:
+
+1.  `dataset_id`: This value should be replaced with the Socrata UID of the city's metadata catalog. This catalog contains one row for every dataset available on the portal. A list of known catalog datasets can be found on the package reference page.
+2.  `type`: Many Socrata portals include rows describing charts, maps, stories, or other resources in addition to datasets. When possible, filter the metadata so that only true datasets are returned. Verify both the name of the column (often `type`) and the value representing datasets (typically "`dataset`").
+3.  `name`: Verify which column contains the human-readable dataset name. Most portals use either `name` or `title`, although this varies slightly between cities.
+4.  `UID`: The UID is the four-character-by-four-character Socrata identifier (for example `erm2-nwe9`) used when downloading datasets. Some metadata catalogs call this column `uid`, while others use `id.`
+
+::: callout-tip
+## Why make a key?
+
+Although every Socrata dataset has a permanent UID, those identifiers are difficult to remember. For example, `erm2-nwe9` is much less descriptive than `parking_violations_issued`. The package therefore generates a human-readable key using `janitor::make_clean_names()`. Users can reference datasets using either the generated key or the official UID.
+:::
+
+## Verifying Your Results
+
+After making the necessary replacements, run the following:
+
+``` text
+city_list_datasets()
+```
+
+Confirm that:
+
+- the function returns a tibble
+
+- each row represents one dataset
+
+- the `key` column contains readable names
+
+- every row has a valid UID
+
+- duplicate UIDs have been removed
+
+- datasets can be located using keyword searches
+
+This catches most metadata issues before moving on to the remainder of the package.
+
+## Template Values to Replace
+
+Below is a table on the template values that need to be replaced per the specific city, and what they need to be replaced with.
+
+| Template value | Replace with |
+|---------------------|---------------------------------------------------|
+| `CITY_NAME` | Full city name |
+| `city` | Package/function prefix |
+| `CATALOG_DATASET_ID` | Socrata UID of the metadata catalog |
+| `"dataset"` | Value representing datasets in the metadata catalog (if different) |
+| `.data$type` | Column identifying resource type (if different) |
+| `.data$name` | Column containing dataset names |
+| `.data$uid` | Column containing dataset UIDs |
+| `KEYWORD` | A useful example keyword for the documentation |
+
+## Common Pitfalls
+
+- Using the wrong metadata dataset.
+- Forgetting to filter to datasets only.
+- Using the wrong UID column.
+- Assuming the dataset name column is always called `name`.
+- Forgetting to regenerate the `key` column.
+
+## Chapter Checklist
+
+Before continuing, confirm that you have:
+
+- [ ] Replaced `CITY_NAME` throughout the script.
+- [ ] Updated the package/function prefix.
+- [ ] Inserted the correct metadata catalog UID.
+- [ ] Verified the metadata contains only datasets.
+- [ ] Confirmed the dataset name column.
+- [ ] Confirmed the UID column.
+- [ ] Updated the example keyword in the documentation.
+- [ ] Successfully ran `city_list_datasets()`.
+- [ ] Confirmed the output contains the expected metadata.
+- [ ] Documentation examples run successfully.

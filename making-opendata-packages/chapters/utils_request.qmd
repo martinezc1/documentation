@@ -1,0 +1,117 @@
+# `utils_request.R`
+
+## Introduction
+
+Unlike the previous chapters, this file does not define functions that package users call directly. Instead, it contains the internal helper functions responsible for constructing API requests, validating user inputs, downloading data, and post-processing responses.
+
+```{mermaid}
+flowchart TD
+A[User calls package function]
+--> B[Input validation]
+--> C[Build endpoint]
+--> D[Build SoQL query]
+--> E[Download JSON]
+--> F[Post-process data]
+--> G[Return tibble]
+```
+
+Nearly every exported function in the package relies on these helpers. By centralizing this logic in a single script, improvements and bug fixes only need to be made once rather than being duplicated throughout the package.
+
+::: callout-tip
+## These are internal helper functions
+
+The functions in `utils_request.R` are internal utilities and are not intended to be called directly by package users.
+
+Instead, they provide the shared functionality used by `city_list_datasets()`, `city_pull_dataset()`, and `city_any_dataset()`.
+:::
+
+## What Needs to Change
+
+Most helper functions can be reused without modification. However, verify the following:
+
+- **`.city_endpoint()`** uses the correct Socrata domain.
+
+- All internal helper names use the package prefix.
+
+- Package-facing error messages reference the correct city.
+
+- Remove reviewer comments that were specific to the template development process.
+
+The remaining helper functions are intentionally generic and should not require modification unless you are changing the overall architecture of th e package.
+
+## Understanding the Helper Functions
+
+| Helper | Purpose |
+|------------------------------------|------------------------------------|
+| `.city_endpoint()` | Constructs the Socrata JSON endpoint for a dataset |
+| `.city_validate_limit()` | Validates the `limit` argument |
+| `.city_validate_timeout()` | Validates request timeout values |
+| `.city_validate_filters()` | Validates user-supplied filters |
+| `.city_add_filters()` | Converts filters into SoQL equality clauses |
+| `.city_add_where()` | Appends raw SoQL `WHERE` conditions |
+| `.city_get_json()` | Executes the API request and parses the JSON response |
+| `.city_dataset_request()` | Coordinates validation, querying, downloading, and post-processing |
+| `.city_postprocess()` | Cleans column names and optionally coerces data types |
+| `.city_build_date_where()` | Constructs date-based SoQL filters |
+
+## Verifying Your Results
+
+After making the necessary replacements, verify that:
+
+- [ ] the correct Socrata domain is used
+- [ ] helper functions use the correct package prefix
+- [ ] invalid inputs produce informative errors
+- [ ] API requests complete successfully
+- [ ] JSON responses are converted to tibbles
+- [ ] column names are cleaned correctly
+- [ ] type coercion behaves as expected
+
+## Template to Insert Table
+
+Below is a table on the template values that need to be replaced per the specific city, and what they need to be replaced with.
+
+| Template value | Replace with |
+|-----------------------------------|-------------------------------------|
+| `CITY_NAME` | Full city name or package-facing city label used in error messages, such as `NYC`, `Chicago`, or `Los Angeles` |
+| `.city_abort()` | Package-specific internal prefix |
+| `.city_coerce_types()` | Package-specific internal prefix |
+| `.city_postprocess()` | Package-specific internal prefix |
+| `.city_validate_limit()` | Package-specific internal prefix |
+| `.city_validate_timeout()` | Package-specific internal prefix |
+| `.city_validate_filters()` | Package-specific internal prefix |
+| `.city_endpoint()` | Package-specific internal prefix |
+| `.city_add_filters()` | Package-specific internal prefix |
+| `.city_add_where()` | Package-specific internal prefix |
+| `.city_get_json()` | Package-specific internal prefix |
+| `.city_dataset_request()` | Package-specific internal prefix |
+| `.city_validate_date_yyyy_mm_dd()` | Package-specific internal prefix |
+| `.city_build_date_where()` | Package-specific internal prefix |
+| `SOCRATA_DOMAIN` | The city Open Data portal’s Socrata domain |
+| `"No internet connection detected. This function requires access to the CITY_NAME Open Data portal."` | A city-specific connection error message, preferably naming the actual portal domain |
+| `"CITY_NAME Open Data request failed..."` | A city-specific API request error message |
+| File header text referring to `CITY_NAME Open Data requests` | The package’s city name and internal prefix |
+| Reviewer-specific comments such as `r07/r08` or `r16/r17` | Remove or replace with general-purpose comments suitable for the template |
+
+## Common Pitfalls
+
+When customizing `utils_request.R`, the most common issues are:
+
+- Forgetting to update the Socrata domain in `.city_endpoint()`.
+- Leaving template package prefixes (such as `.city_*`) unchanged.
+- Forgetting to update city names in user-facing error messages.
+- Removing helper functions that are still referenced elsewhere in the package.
+- Modifying shared helper functions without testing all exported functions.
+- Leaving reviewer comments from the template in the finished package.
+
+## Chapter Checklist
+
+Before continuing, confirm that you have:
+
+- [ ] Updated all internal helper prefixes.
+- [ ] Updated the Socrata domain.
+- [ ] Updated package-facing error messages.
+- [ ] Removed reviewer-specific comments.
+- [ ] Verified endpoint construction.
+- [ ] Verified API requests succeed.
+- [ ] Verified post-processing works.
+- [ ] Confirmed all exported functions still execute correctly.

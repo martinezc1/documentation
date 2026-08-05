@@ -1,0 +1,57 @@
+# Citation and Attribution {.unnumbered}
+
+## Using This Framework
+
+The OpenData Package Developer's Guide was created to make it easier for others to build high-quality OpenData packages for Socrata-powered portals.
+
+You are encouraged to adapt and extend the framework for your own city, organization, or educational setting. The goal of this project is to grow a consistent ecosystem of OpenData packages that share a common design philosophy while serving different communities.
+
+------------------------------------------------------------------------
+
+## If You Build a Package
+
+If your package is based on this framework, consider acknowledging the guide in one of the following places:
+
+- your package `README`
+
+- your package website
+
+- the package vignette
+
+- academic publications describing the package
+
+For example:
+
+> This package was developed using *The OpenData Package Developer's Guide* by Christian Martinez.
+
+or
+
+> This package was built using the OpenData package framework introduced by Christian Martinez.
+
+------------------------------------------------------------------------
+
+## Citation
+
+If this guide contributed substantially to your package or research, please cite:
+
+@Martinez2026OpenDataGuide
+
+------------------------------------------------------------------------
+
+## The OpenData Ecosystem
+
+Every package built using this framework contributes to a growing ecosystem of tools that make municipal Open Data more accessible.
+
+Rather than maintaining dozens of unrelated implementations, this framework encourages consistency across packages while allowing each city to highlight its own data resources.
+
+If you develop a new package using this guide, consider letting the project know. We would love to include it in the growing list of OpenData packages.
+
+------------------------------------------------------------------------
+
+## Related Resources
+
+Additional resources related to this guide include:
+
+- **Reproducible Research Using R** @Martinez2026ReproducibleResearch — A companion textbook covering Quarto, reproducible workflows, and scientific communication.
+
+- **OpenData Packages** @R-nycOpenData; @R-nysOpenData; @R-mtaOpenData; @R-chiOpenData; @R-laOpenData — Reference implementations of the architecture presented throughout this guide.

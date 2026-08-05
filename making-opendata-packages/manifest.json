@@ -1,0 +1,230 @@
+{
+  "version": 1,
+  "locale": "en_US",
+  "platform": "4.5.1",
+  "metadata": {
+    "appmode": "quarto-static",
+    "primary_rmd": "index.qmd",
+    "primary_html": null,
+    "content_category": null,
+    "has_parameters": false
+  },
+  "quarto": {
+    "version": "1.9.38",
+    "engines": ["markdown"]
+  },
+  "packages": null,
+  "files": {
+    "_book/chapters/citation.html": {
+      "checksum": "d4de793c6b6c22fb73b9dec89d0e98ec"
+    },
+    "_book/chapters/city_any_dataset.html": {
+      "checksum": "41ba45d6c83203363bd46b6eb445ec21"
+    },
+    "_book/chapters/city_list_dataset.html": {
+      "checksum": "4ab248a0b1e1ad29c2281a38356f56d7"
+    },
+    "_book/chapters/city_pull_dataset.html": {
+      "checksum": "f0730ccf89fedaefcfcbbeae910a335f"
+    },
+    "_book/chapters/finalizing-your-package.html": {
+      "checksum": "e435de8a3837709dd15940de3a55502b"
+    },
+    "_book/chapters/getting-started.html": {
+      "checksum": "1b4e9df5194d734586ae593eff972db8"
+    },
+    "_book/chapters/packages.html": {
+      "checksum": "6ae104df9e635645e55a2223f23efb83"
+    },
+    "_book/chapters/template-city-any-dataset.html": {
+      "checksum": "871739d58e43a4041da4dd53477cc141"
+    },
+    "_book/chapters/template-city-list-dataset.html": {
+      "checksum": "3fd9ec82f44e39b2a394f1e79c200b01"
+    },
+    "_book/chapters/template-city-pull-dataset.html": {
+      "checksum": "5be20dc664175face79514c50194c8e2"
+    },
+    "_book/chapters/template-description.html": {
+      "checksum": "0808a3ec723d4274040bb273cf24515c"
+    },
+    "_book/chapters/template-readme.html": {
+      "checksum": "71900d80e6f739fc49204d324d380570"
+    },
+    "_book/chapters/template-utils-requests.html": {
+      "checksum": "1d7ad307ac909745cf6964df8d2f001f"
+    },
+    "_book/chapters/template-vignette.html": {
+      "checksum": "201a4b3d7e31b6f991ac4883066eeb81"
+    },
+    "_book/chapters/utils_request.html": {
+      "checksum": "1ad5ef8b419b5b5934ef2c01cf3f1185"
+    },
+    "_book/index.html": {
+      "checksum": "00bf2fa9d58865e9115e0e51ca83dda1"
+    },
+    "_book/search.json": {
+      "checksum": "4c87f6bdfcf53587862fb62b21f7f575"
+    },
+    "_book/site_libs/bootstrap/bootstrap-367522ac618891c39d4b2ae87ea7600e.min.css": {
+      "checksum": "367522ac618891c39d4b2ae87ea7600e"
+    },
+    "_book/site_libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "886da841d7421705f715f600c5ff11bb"
+    },
+    "_book/site_libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
+    },
+    "_book/site_libs/bootstrap/bootstrap.min.js": {
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
+    },
+    "_book/site_libs/clipboard/clipboard.min.js": {
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
+    },
+    "_book/site_libs/quarto-diagram/mermaid-init.js": {
+      "checksum": "35cf34474c6b3cb3e659633a985a71cd"
+    },
+    "_book/site_libs/quarto-diagram/mermaid.css": {
+      "checksum": "0aeecd8a816e25e43a41943c6146c2b7"
+    },
+    "_book/site_libs/quarto-diagram/mermaid.min.js": {
+      "checksum": "b083b6bcb3a68ca7b61312fef800366f"
+    },
+    "_book/site_libs/quarto-html/anchor.min.js": {
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
+    },
+    "_book/site_libs/quarto-html/popper.min.js": {
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "_book/site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css": {
+      "checksum": "15634bcf2e68342d4ad2dfa704d543f6"
+    },
+    "_book/site_libs/quarto-html/quarto.js": {
+      "checksum": "6f4245742deb3cc92337dbe2701ccfe1"
+    },
+    "_book/site_libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
+    },
+    "_book/site_libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "_book/site_libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "_book/site_libs/quarto-nav/headroom.min.js": {
+      "checksum": "ace0360e576db9b6e7df48ac68ddbbf4"
+    },
+    "_book/site_libs/quarto-nav/quarto-nav.js": {
+      "checksum": "12d334846b27bdb493298c08277bdf7f"
+    },
+    "_book/site_libs/quarto-search/autocomplete.umd.js": {
+      "checksum": "b514204f2ef1ca7a8e2ad4579d263504"
+    },
+    "_book/site_libs/quarto-search/fuse.min.js": {
+      "checksum": "de7d60e4a6881074275feca14b84a49d"
+    },
+    "_book/site_libs/quarto-search/quarto-search.js": {
+      "checksum": "9c992af743ca88c8c5f650cf312c4e61"
+    },
+    "_quarto.yml": {
+      "checksum": "f08e04a57fe52416903c7e4cbe8f6c21"
+    },
+    ".RData": {
+      "checksum": "8444642da60686f380b1de0a792d628f"
+    },
+    "chapters/citation.qmd": {
+      "checksum": "b3b7842105171f4aa6bde69d9e2fee15"
+    },
+    "chapters/city_any_dataset.qmd": {
+      "checksum": "a83fd49a9d07dc02ebe02061df54498f"
+    },
+    "chapters/city_list_dataset.qmd": {
+      "checksum": "f2ba8bc72dbd8c4d9d3374d4fd8de702"
+    },
+    "chapters/city_pull_dataset.qmd": {
+      "checksum": "1695f0bbe04681b7deb1613e7dcef29b"
+    },
+    "chapters/finalizing-your-package.qmd": {
+      "checksum": "61184e21bb84179eff00b37f0b64d07f"
+    },
+    "chapters/getting-started.qmd": {
+      "checksum": "d3db59fabb61fdcae9d850b04fffcd89"
+    },
+    "chapters/packages.qmd": {
+      "checksum": "a8572d111b6935a3d656e9489f4d6d7b"
+    },
+    "chapters/template-city-any-dataset.qmd": {
+      "checksum": "8cb8ca547681e9dd166b6bdc83115382"
+    },
+    "chapters/template-city-list-dataset.qmd": {
+      "checksum": "f58539fdfb4f7bb1c8e0b21eb41a0615"
+    },
+    "chapters/template-city-pull-dataset.qmd": {
+      "checksum": "52ed8ce4da8ed913bd9e7f67765a499e"
+    },
+    "chapters/template-description.qmd": {
+      "checksum": "6140f678b4106e58ca1a67c1d3184b93"
+    },
+    "chapters/template-readme.qmd": {
+      "checksum": "e626b0b86358de56d62188f2c41d1833"
+    },
+    "chapters/template-utils-requests.qmd": {
+      "checksum": "02b696eaa023008b4b0e22aadb572c1a"
+    },
+    "chapters/template-vignette.qmd": {
+      "checksum": "8889207d6c16518b3b5d8cb486917c54"
+    },
+    "chapters/utils_request.qmd": {
+      "checksum": "9d33520e682ba12af4887a679aa03409"
+    },
+    "images/Screenshot 2026-07-15 at 16.49.50.png": {
+      "checksum": "27aef6a0c9e5e679b169e6f4a7232356"
+    },
+    "index.qmd": {
+      "checksum": "bed0f8fce8db2f9ffe6ef65433f35ce1"
+    },
+    "packages_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css": {
+      "checksum": "138a6193a3bd40baf1e627da441a4734"
+    },
+    "packages_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "886da841d7421705f715f600c5ff11bb"
+    },
+    "packages_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
+    },
+    "packages_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
+    },
+    "packages_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
+    },
+    "packages_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
+    },
+    "packages_files/libs/quarto-html/popper.min.js": {
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "packages_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css": {
+      "checksum": "15634bcf2e68342d4ad2dfa704d543f6"
+    },
+    "packages_files/libs/quarto-html/quarto.js": {
+      "checksum": "6f4245742deb3cc92337dbe2701ccfe1"
+    },
+    "packages_files/libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
+    },
+    "packages_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "packages_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "README.md": {
+      "checksum": "3adfffc6824851c9de8a289c00817dee"
+    },
+    "README.Rmd": {
+      "checksum": "da7f858e6a5f3a84f6d25bb87ba2db03"
+    }
+  },
+  "users": null
+}

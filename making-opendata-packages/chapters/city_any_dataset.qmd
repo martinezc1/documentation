@@ -1,0 +1,87 @@
+# `city_any_dataset()`
+
+## Introduction
+
+`city_any_dataset()` serves as a fallback when a dataset cannot be located through `city_list_datasets()`. Rather than searching the package's metadata catalog, this function downloads data directly from a Socrata JSON endpoint.
+
+```{mermaid}
+flowchart TD
+A[User provides JSON endpoint] --> B[Validate URL]
+B --> C[Send API request]
+C --> D[Download JSON]
+D --> E[Post-process data]
+E --> F[Return tibble]
+```
+
+In most cases, users should prefer `city_pull_dataset()`, since it provides readable dataset keys and additional convenience features. However, `city_any_dataset()` is useful for newly published datasets, datasets omitted from the metadata catalog, or any valid Socrata JSON endpoint.
+
+::: callout-tip
+## When should I use `city_any_dataset()`?
+
+Use `city_pull_dataset()` whenever the dataset is available in the package catalog.
+
+Use `city_any_dataset()` only when you already have a Socrata JSON endpoint or when the dataset is not available through `city_list_datasets()`.
+:::
+
+## What Needs to Change
+
+Very little of the underlying function changes from city to city.
+
+The primary customizations are:
+
+- updating package-specific function names
+- updating package-specific internal helper names
+- replacing the example Socrata domain
+- replacing the example dataset UID
+
+## Verifying Your Results
+
+After making the necessary replacements, verify that:
+
+- [ ] a valid JSON endpoint downloads successfully
+- [ ] invalid URLs produce informative errors
+- [ ] column names are cleaned when `clean_names = TRUE`
+- [ ] type coercion behaves as expected
+- [ ] documentation examples execute successfully
+
+## Template Values to Replace
+
+Below is a table on the template values that need to be replaced per the specific city, and what they need to be replaced with.
+
+| Template value | Replace with |
+|----|----|
+| `CITY_NAME` | Full city name, such as `NYC`, `Chicago`, or `Los Angeles` |
+| `city_any_dataset()` | Package-specific public function name |
+| `city_list_datasets()` | Package-specific catalog-listing function |
+| `city_pull_dataset()` | Package-specific catalog-based download function |
+| `.city_validate_limit()` | Package-specific internal prefix |
+| `.city_validate_timeout()` | Package-specific internal prefix |
+| `.city_get_json()` | Package-specific internal prefix |
+| `.city_postprocess()` | Package-specific internal prefix |
+| `SOCRATA_DOMAIN` | The city portal’s Socrata domain |
+| `"abcd-1234"` | A real example Socrata dataset UID |
+| Example dataset description | The name or description of the dataset associated with the example UID |
+
+## Common Pitfalls
+
+When customizing `city_any_dataset()`, the most common issues are:
+
+- Forgetting to replace `SOCRATA_DOMAIN` in the documentation examples.
+- Using a dataset page URL instead of the JSON endpoint.
+- Forgetting the `.json` suffix on the endpoint.
+- Using a dataset UID that no longer exists.
+- Updating the function but forgetting to update the documentation examples.
+- Assuming every Socrata endpoint is included in the package catalog.
+
+## Chapter Checklist
+
+Before continuing, confirm that you have:
+
+- [ ] Updated all package function prefixes.
+- [ ] Updated all internal helper prefixes.
+- [ ] Replaced the example Socrata domain.
+- [ ] Replaced the example dataset UID.
+- [ ] Verified the example JSON endpoint downloads successfully.
+- [ ] Verified `clean_names = TRUE` works.
+- [ ] Verified `coerce_types = TRUE` works.
+- [ ] Verified the documentation examples run successfully.

@@ -1,0 +1,66 @@
+# Choosing a City
+
+## Introduction
+
+The package template described throughout this guide is designed for cities that use the Socrata Open Data Platform. Because Socrata provides a standardized API across portals, the same package architecture can be reused with only a handful of city-specific modifications.
+
+This chapter lists major U.S. cities with Socrata-based Open Data portals and provides the two most important values needed when creating a new package:
+
+- the Socrata portal domain
+- the metadata catalog dataset used by `city_list_datasets()`
+
+::: callout-tip
+## Using this table
+
+Each row contains the two values needed to begin creating a new package.
+
+1.  **Portal Domain**
+
+- Used by `.city_endpoint()` in `utils_request.R`.
+- *For example*: https://data.sfgov.org/resource/
+
+2.  **Metadata Dataset**
+
+- Used as the `dataset_id` in `city_list_datasets()`.
+- *For example*: y8fp-fbf5
+
+The complete metadata endpoint would therefore be:
+
+- https://data.sfgov.org/resource/y8fp-fbf5.json
+:::
+
+| City | Website | API Base Endpoint | Metadata Dataset UID | Metadata JSON Endpoint | Package Status |
+|:-----------|:-----------|:-----------|:-----------|:-----------|:-----------|
+| **New York City, NY** | <https://data.cityofnewyork.us> | `https://data.cityofnewyork.us/resource/` | `5tqd-u88y` | <https://data.cityofnewyork.us/resource/5tqd-u88y.json> | ✅ `nycOpenData` |
+| **New York State, NY** | <https://data.ny.gov> | `https://data.ny.gov/data.json` | Does not follow typical JSON Endpoint structure | <https://data.ny.gov/resource/ca8h-8gjq.json> | ✅ `nysOpenData` |
+| **Chicago, IL** | <https://data.cityofchicago.org> | `https://data.cityofchicago.org/resource/` | `rsxa-ify5` | <https://data.cityofchicago.org/resource/rsxa-ify5.json> | ✅ `chiOpenData` |
+| **Los Angeles, CA** | <https://data.lacity.org> | `https://data.lacity.org/resource/` | `fmt9-hut6` | <https://data.lacity.org/resource/fmt9-hut6.json> | ✅ `laOpenData` |
+| **San Francisco, CA** | <https://data.sfgov.org> | `https://data.sfgov.org/resource/` | `y8fp-fbf5` | <https://data.sfgov.org/resource/y8fp-fbf5.json> | ⬜ Available |
+| **Seattle, WA** | <https://data.seattle.gov> | `https://data.seattle.gov/resource/` | `phjv-68rp` | <https://data.seattle.gov/resource/phjv-68rp.json> | ⬜ Available |
+| **Austin, TX** | <https://data.austintexas.gov> | `https://data.austintexas.gov/resource/` | `my8q-n4hf` | <https://data.austintexas.gov/resource/my8q-n4hf.json> | 🚧 `ausOpenData` (In Progress) |
+| **Dallas, TX** | <https://data.dallascityhall.com> | `https://data.dallascityhall.com/resource/` | `7h2m-4a3j` | <https://data.dallascityhall.com/resource/7h2m-4a3j.json> | ⬜ Available |
+| **New Orleans, LA** | <https://data.nola.gov> | `https://data.nola.gov/resource/` | `dhg4-3vbu` | <https://data.nola.gov/resource/dhg4-3vbu.json> | ⬜ Available |
+| **Detroit, MI** | <https://data.detroitmi.gov> | `https://data.detroitmi.gov/resource/` | `pacb-jr36` | <https://data.detroitmi.gov/resource/pacb-jr36.json> | ⬜ Available |
+| **Cincinnati, OH** | <https://data.cincinnati-oh.gov> | `https://data.cincinnati-oh.gov/resource/` | `a56y-rtyz` | <https://data.cincinnati-oh.gov/resource/a56y-rtyz.json> | ⬜ Available |
+
+::: callout-note
+## Finding additional cities
+
+New Socrata portals are created and updated over time.
+
+If your city is not listed here, search for its Open Data portal and determine whether it is powered by Socrata. If so, identify:
+
+- the portal domain
+- the metadata catalog dataset
+
+Those two values are all that is required to begin adapting the package template.
+:::
+
+## Before You Begin
+
+Before starting a new package, verify that:
+
+- [ ] The city uses a Socrata-powered Open Data portal.
+- [ ] The metadata catalog dataset is publicly accessible.
+- [ ] Dataset JSON endpoints follow the standard `/resource/<uid>.json` format.
+- [ ] API requests do not require authentication for the datasets you intend to use.
