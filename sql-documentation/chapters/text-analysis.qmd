@@ -217,9 +217,9 @@ You should now have an R data frame containing:
 
 - the original article information;
 
-- `article_id`;
-- `url`; and
-- `article_text`.
+- `article_id`
+- `url`
+- `article_text`
 
 ### Notes {#sec-text-project-extract-text-notes}
 
