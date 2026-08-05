@@ -2,99 +2,76 @@
 output: github_document
 ---
 
-# SQL for Text Analytics
+# NYC Open Data Lab Documentation
 
-A working guide for incorporating **SQL and SQLite into R-based text
-analytics workflows** within the **NYC Open Data Lab Text Analytics &
-Computational Social Science Track**.
+This repository contains **project documentation, implementation guides, working plans, and educational resources** developed for the [NYC Open Data Lab](nycopendatalab.org).
+
+The purpose of this repository is to provide a central location for documentation that supports Lab projects, internships, and reproducible workflows.
 
 ## About
 
-This repository contains a Quarto book designed to support students who
-are already familiar with R but are new to working with SQL and
-relational databases.
+[NYC Open Data Lab](nycopendatalab.org) projects often involve multiple stages of development, from initial planning and technical implementation to analysis, documentation, and public release.
 
-The goal is not to provide a comprehensive SQL textbook. Instead, the
-guide introduces SQL through real project workflows, with R remaining
-the primary working environment.
+This repository is used to document those processes.
 
-Students learn how to use:
+Resources may include:
 
-- **R** for data preparation, web scraping, and analysis;
-- **SQL** for querying, filtering, summarizing, and managing data;
-- **SQLite** for storing project data;
-- **DBI** and **RSQLite** for connecting R to SQLite; and
-- **Quarto** for documenting reproducible workflows.
+- project plans and development roadmaps;
+- implementation guides;
+- student and intern working documents;
+- technical documentation;
+- reproducible workflows;
+- checklists and project milestones; and
+- reference materials.
 
-## Guide Structure
+Documentation is intended to support both active projects and future contributors who may need to reproduce, continue, or adapt previous work.
 
-The guide currently contains two primary chapters:
+## Current Documentation
 
-### Databases, SQL, and R
+### Dashboard
 
-An introduction to databases, SQL, SQLite, and working with relational
-data directly from R.
+The `dashboard/` directory contains planning and development documentation for dashboard projects within the NYC Open Data Lab.
 
-Topics include database connections, SQL queries, filtering, sorting,
-aggregation, joins, creating databases, and working with primary and
-foreign keys.
+The current dashboard plan provides a structured roadmap for developing an interactive dashboard, including project stages, tasks, milestones, and expected deliverables.
 
-### Text Analysis Project
+### SQL Documentation
 
-A working project that applies these concepts to a collection of online
-articles.
+The `sql-documentation/` directory contains a Quarto book for incorporating **SQL and SQLite into R-based analytical workflows**.
 
-The workflow moves through:
+The guide is designed primarily for students and interns who already have experience with R but may have little or no previous experience with SQL.
 
-```         
-Excel Article List
-        ↓
-Import into R
-        ↓
-Create SQLite Database
-        ↓
-Retrieve URLs into R
-        ↓
-Extract Article Text
-        ↓
-Update SQLite Database
-        ↓
-Retrieve Data into R
-```
+It currently includes:
 
-The resulting data can then be used for subsequent text analysis.
+- an introduction to databases, SQL, SQLite, and working with databases from R; and
+- a working text-analysis project that applies those concepts to collecting and storing article text.
 
-## A Working Guide
+The documentation is designed to be completed alongside actual project work so that code, notes, decisions, and solutions can become reusable references for future projects.
 
-Project chapters are designed to be completed alongside the actual work.
+## Working Documentation
 
-They contain:
+Many resources in this repository are intentionally designed as **working documents** rather than static manuals.
 
-- project goals
-- task checklists
-- working code sections
-- checkpoints
-- space for notes
-- links to relevant SQL documentation
-- summaries of important functions and commands
+As projects develop, contributors may add:
 
-Students are encouraged to document their code, decisions, problems, and
-solutions as they work.
+- working code
+- notes
+- project decisions
+- encountered problems and solutions
+- completed milestones
+- lessons that may be useful for future projects
 
-The goal is for the completed guide to become a **reusable reference for future projects**, allowing students to reproduce similar workflows with
-increasing independence.
+The goal is to preserve not only the final product, but also the **workflow used to create it**.
 
 ## Development
 
-This guide is intended to grow alongside projects within the Text
-Analytics & Computational Social Science Track. Additional chapters may
-be added as new SQL techniques, database structures, or reusable
-workflows become relevant.
+This repository is expected to grow alongside the NYC Open Data Lab.
+
+New directories and documentation may be added as new projects, internships, technical workflows, and educational resources are developed.
+
+Where possible, documentation should be written so that it can be reused or adapted by future students, interns, and contributors.
 
 ## NYC Open Data Lab
 
-The **NYC Open Data Lab** develops open tools, reproducible research
-workflows, educational resources, and public-facing data projects.
+The [**NYC Open Data Lab**](nycopendatalab.org) develops open tools, reproducible research workflows, educational resources, and public-facing data projects.
 
-This guide was developed as part of the Lab's internship program to
-support hands-on technical learning through real projects.
+Documentation in this repository supports the Lab's broader goal of making its projects transparent, reproducible, and easier for others to understand, contribute to, and build upon.
