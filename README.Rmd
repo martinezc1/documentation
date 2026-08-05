@@ -2,22 +2,26 @@
 output: github_document
 ---
 
+---
+output: github_document
+---
+
 # NYC Open Data Lab Documentation
 
-This repository contains **project documentation, implementation guides, working plans, and educational resources** developed for the [NYC Open Data Lab](nycopendatalab.org).
+This repository contains **project documentation, implementation guides, working plans, and educational resources** developed for the [NYC Open Data Lab](https://nycopendatalab.org).
 
-The purpose of this repository is to provide a central location for documentation that supports Lab projects, internships, and reproducible workflows.
+The purpose of this repository is to provide a central location for documentation that supports Lab projects, open-source development, internships, and reproducible workflows.
 
 ## About
 
-[NYC Open Data Lab](nycopendatalab.org) projects often involve multiple stages of development, from initial planning and technical implementation to analysis, documentation, and public release.
+[NYC Open Data Lab](https://nycopendatalab.org) projects often involve multiple stages of development, from initial planning and technical implementation to analysis, documentation, and public release.
 
-This repository is used to document those processes.
+This repository is used to document those processes and provide reusable resources for current and future contributors.
 
 Resources may include:
 
 - project plans and development roadmaps;
-- implementation guides;
+- implementation and developer guides;
 - student and intern working documents;
 - technical documentation;
 - reproducible workflows;
@@ -28,11 +32,13 @@ Documentation is intended to support both active projects and future contributor
 
 ## Current Documentation
 
-### Dashboard
+### NYC 311 Dashboard Plan
 
-The `dashboard/` directory contains planning and development documentation for dashboard projects within the NYC Open Data Lab.
+The `dashboard/` directory contains planning and development documentation for the **NYC 311 Dashboard**.
 
-The current dashboard plan provides a structured roadmap for developing an interactive dashboard, including project stages, tasks, milestones, and expected deliverables.
+The guide provides a structured roadmap for developing the interactive dashboard, including project stages, weekly tasks, milestones, and expected deliverables.
+
+The dashboard itself is maintained separately as an NYC Open Data Lab project, while this documentation preserves the development plan and workflow used to build it.
 
 ### SQL Documentation
 
@@ -42,10 +48,74 @@ The guide is designed primarily for students and interns who already have experi
 
 It currently includes:
 
-- an introduction to databases, SQL, SQLite, and working with databases from R; and
-- a working text-analysis project that applies those concepts to collecting and storing article text.
+- an introduction to databases, SQL, and SQLite;
+- connecting R to SQLite databases;
+- querying and managing data using SQL from R; and
+- a working text-analysis project that applies these concepts to collecting, storing, and analyzing textual data.
 
 The documentation is designed to be completed alongside actual project work so that code, notes, decisions, and solutions can become reusable references for future projects.
+
+### OpenData Package Developer's Guide
+
+The `open-data-package-guide/` directory contains the **OpenData Package Developer's Guide**, a step-by-step handbook for creating R packages that provide convenient access to Socrata-powered Open Data portals.
+
+Originally developed from the architecture behind **nycOpenData**, the guide documents the process for adapting the OpenData package framework to additional cities and data portals.
+
+The guide covers:
+
+- creating a new R package;
+- connecting the project to GitHub;
+- customizing the OpenData package template;
+- working with the core package functions;
+- documenting functions and creating vignettes;
+- testing and checking packages;
+- creating a pkgdown website; and
+- preparing a package for CRAN submission.
+
+Core functions covered by the framework include:
+
+- `city_list_datasets()`
+- `city_pull_dataset()`
+- `city_any_dataset()`
+- `utils_request.R`
+
+The appendices also contain reusable template files that can be adapted when developing new packages.
+
+The guide supports the broader **OpenData R package ecosystem**, which includes packages such as:
+
+- [`nycOpenData](https://docs.ropensci.org/nycOpenData/index.html) --- New York City Open Data
+- [`nysOpenData`](https://martinezc1.github.io/nysOpenData/) --- New York State Open Data
+- [`mtaOpenData`](https://martinezc1.github.io/mtaOpenData/) --- Metropolitan Transportation Authority Open Data
+- [`laOpenData`](https://martinezc1.github.io/laOpenData/) --- Los Angeles Open Data
+- [`chiOpenData`](https://martinezc1.github.io/chiOpenData/) --- Chicago Open Data
+- [`ausOpenData`](https://martinezc1.github.io/ausOpenData/) --- Austin Open Data
+
+Additional packages and extensions to the framework may be developed over time.
+
+## Repository Structure
+
+The repository is organized around independently maintained documentation projects:
+
+```text
+documentation/
+│
+├── dashboard/
+│   ├── _quarto.yml
+│   └── ...
+│
+├── sql-documentation/
+│   ├── _quarto.yml
+│   └── ...
+│
+├── open-data-package-guide/
+│   ├── _quarto.yml
+│   └── ...
+│
+├── README.Rmd
+└── documentation.Rproj
+```
+
+Each documentation directory can maintain its own Quarto configuration and be developed and published independently while remaining part of the larger NYC Open Data Lab documentation ecosystem.
 
 ## Working Documentation
 
@@ -53,25 +123,35 @@ Many resources in this repository are intentionally designed as **working docume
 
 As projects develop, contributors may add:
 
-- working code
-- notes
-- project decisions
-- encountered problems and solutions
-- completed milestones
-- lessons that may be useful for future projects
+- working code;
+- notes;
+- project decisions;
+- encountered problems and solutions;
+- completed milestones; and
+- lessons that may be useful for future projects.
 
 The goal is to preserve not only the final product, but also the **workflow used to create it**.
+
+Other resources, such as the OpenData Package Developer's Guide, serve as more established reference materials that document workflows developed through previous Lab work.
+
+Together, these approaches allow the repository to capture both **how work is currently being developed** and **what has already been learned from completed development processes**.
 
 ## Development
 
 This repository is expected to grow alongside the NYC Open Data Lab.
 
-New directories and documentation may be added as new projects, internships, technical workflows, and educational resources are developed.
+New directories and documentation may be added as new projects, internships, technical workflows, open-source tools, and educational resources are developed.
 
-Where possible, documentation should be written so that it can be reused or adapted by future students, interns, and contributors.
+Where possible, documentation should be written so that it can be reused or adapted by future students, interns, developers, and contributors.
+
+## Contributing
+
+Suggestions, corrections, and improvements to documentation are welcome.
+
+Contributors may open an issue or submit a pull request to correct errors, improve existing resources, or expand documentation where appropriate.
 
 ## NYC Open Data Lab
 
-The [**NYC Open Data Lab**](nycopendatalab.org) develops open tools, reproducible research workflows, educational resources, and public-facing data projects.
+The [**NYC Open Data Lab**](https://nycopendatalab.org) develops open tools, reproducible research workflows, educational resources, and public-facing data projects.
 
 Documentation in this repository supports the Lab's broader goal of making its projects transparent, reproducible, and easier for others to understand, contribute to, and build upon.
