@@ -23,6 +23,7 @@ book:
     - chapters/template-description.qmd
     - chapters/template-readme.qmd
     - chapters/template-vignette.qmd
+    - chapters/git-references.qmd
 
 bibliography: references.bib
 

@@ -1,0 +1,22 @@
+### Git Quick Reference {#sec-git-references}
+
+| Command | Purpose |
+|------------------------------------|------------------------------------|
+| `git init` | Initialize Git for a project |
+| `git status` | View the current branch and changed/staged files |
+| `git add .` | Stage all changes |
+| `git restore --staged .` | Unstage all staged changes without deleting them |
+| `git restore --staged filename` | Unstage one file without deleting its changes |
+| `git commit -m "message"` | Commit staged changes |
+| `git push` | Upload committed changes to GitHub |
+| `git pull` | Download and integrate changes from the remote branch |
+| `git fetch origin` | Retrieve remote changes and branch information without integrating them |
+| `git remote -v` | View connected remote repositories |
+| `git branch` | View local branches |
+| `git branch -a` | View local and remote branches |
+| `git switch branch-name` | Switch to an existing local branch |
+| `git switch -c branch-name` | Create and switch to a new branch |
+| `git switch --track origin/branch-name` | Create a local branch from an existing remote branch |
+| `git merge branch-name` | Merge another branch into the current branch |
+| `git log --oneline` | View a compact commit history |
+| `git log --oneline --graph --all --decorate` | Visualize commit and branch history |
