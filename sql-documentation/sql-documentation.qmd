@@ -1,0 +1,1400 @@
+---
+title: "Using SQL in R"
+subtitle: "A Practical Introduction to Databases, SQL, and R"
+editor: visual
+format:
+  html:
+    code-copy: true
+    code-summary: "Show the code"
+    toc: true
+    number-sections: true
+---
+
+------------------------------------------------------------------------
+
+# Introduction
+
+R is commonly used for data analysis, visualization, and statistical programming. However, R can also interact directly with **SQL databases**.
+
+This means that we can use R as our primary working environment while still learning and writing real SQL code.
+
+This guide provides an introduction to using SQL within R. We will focus on three major skills:
+
+1.  **Connecting to and loading an existing SQL database**
+2.  **Using SQL to explore, filter, summarize, and join database tables**
+3.  **Creating SQL databases and tables from existing files**
+
+By the end of this guide, you should be able to take several separate datasets, combine them into a relational database, and use SQL to work with those datasets directly from R.
+
+Importantly, the SQL code used throughout this guide is actual SQL. Although R is being used to connect to the database, the database itself is still processing SQL queries.
+
+------------------------------------------------------------------------
+
+# Before We Start: What Are SQL and Databases?
+
+Before writing any code, let's quickly define two terms that will appear throughout this guide: **database** and **SQL**.
+
+Don't worry—we'll keep this simple!
+
+## What is a Database?
+
+A **database** is an organized collection of data stored in one place.
+
+If you've worked with Excel or R before, you already understand much of the basic idea.
+
+Imagine you have three Excel files:
+
+1.  students.xlsx
+2.  courses.xlsx
+3.  enrollment.xlsx
+
+Each file contains different—but related—information.
+
+Instead of keeping these as three separate files, we could store them inside **one database**:
+
+```         
+school_database.db
+│
+├── students
+├── courses
+└── enrollment
+```
+
+Each of these is called a **table**.
+
+If you're familiar with R, you can think of a database table as being similar to a data frame:
+
+| Database | R                          |
+|----------|----------------------------|
+| Database | Collection of related data |
+| Table    | Data frame                 |
+| Column   | Variable                   |
+| Row      | Observation                |
+
+The important difference is that a database allows us to store **many related tables together** and easily work across them.
+
+For example, our `students` table might contain:
+
+```         
+student_id | student_name | major
+-----------|--------------|------------
+001        | Alex         | Psychology
+002        | Taylor       | Biology
+003        | Jordan       | Psychology
+```
+
+while `enrollment` might contain:
+
+```         
+student_id | course_id | grade
+-----------|-----------|------
+001        | PSY101    | 92
+001        | PSY200    | 88
+002        | BIO101    | 95
+```
+
+Notice that both tables contain `student_id`.
+
+That allows us to connect information across the database without needing to store everything in one enormous table.
+
+::: callout-tip
+## Think of a database as a container
+
+A database can contain many tables. Those tables can contain different types of information while still being connected to one another.\
+:::
+
+## What is SQL?
+
+**SQL** stands for **Structured Query Language**.
+
+SQL is a language used to communicate with databases.
+
+That's really the main idea!
+
+We can use SQL to ask a database questions such as:
+
+- Give me every student.
+- Give me only Psychology students.
+- What is the average grade?
+- Which students are enrolled in each course?
+- Combine the student information with their enrollment information.
+
+For example, this SQL code:
+
+```         
+SELECT *
+FROM students;
+```
+
+essentially means:
+
+> Give me everything from the `students` table.
+
+We can make our request more specific:
+
+```         
+SELECT *
+FROM students
+WHERE major = 'Psychology';
+```
+
+which means:
+
+> Give me all students whose major is Psychology.
+
+If you already know `dplyr`, SQL will probably look surprisingly familiar.
+
+For example, in R we might write:
+
+```         
+students |>
+  filter(major == "Psychology") |>
+  select(student_id, student_name)
+```
+
+In SQL, we could write:
+
+```         
+SELECT student_id, student_name
+FROM students
+WHERE major = 'Psychology';
+```
+
+::: callout-tip
+## SQL is the language, not the database
+
+A **database** stores and organizes the data.
+
+**SQL** is the language we use to communicate with that database.
+
+Throughout this guide, we will use **SQLite** as our database system and **SQL** as the language used to work with it.\
+:::
+
+## So Where Does R Come In?
+
+This is where everything comes together.
+
+Normally, SQL can be written using dedicated database software. However, since we already know R, we don't need to completely change our workflow just to start learning SQL.
+
+Instead, we can use R to connect to a database and send SQL commands to it.
+
+Our basic workflow will look something like this:
+
+```         
+          R
+          │
+          ▼
+    SQL Connection
+          │
+          ▼
+   ┌──────────────┐
+   │   Database   │
+   ├──────────────┤
+   │ students     │
+   │ courses      │
+   │ enrollment   │
+   └──────────────┘
+          │
+          ▼
+     SQL Query
+          │
+          ▼
+      Results
+          │
+          ▼
+          R
+```
+
+This gives us the best of both worlds.
+
+We can use **SQL** to store, retrieve, filter, summarize, and combine data, while continuing to use **R** for visualization, statistical analysis, modeling, reporting, and everything else we already know how to do.
+
+::: callout-tip
+## TL;DR
+
+1.  **Database:** Where our organized data lives.
+2.  **Table:** A dataset inside the database, similar to an R data frame.
+3.  **SQL:** The language we use to communicate with the database.
+4.  **SQLite:** The database system we will use in this guide.
+5.  **R:** The environment we will use to connect everything together.
+:::
+
+# Packages
+
+We will primarily use three packages:
+
+```         
+library(DBI)
+library(RSQLite)
+library(readxl)
+```
+
+- `DBI` package provides a common interface between R and database systems.
+- `RSQLite` allows us to create and interact with **SQLite databases**.
+- `readxl` allows us to import Excel files into R before adding them to our database.
+
+If these packages are not installed, they can be installed using:
+
+```         
+install.packages(c(
+  "DBI",
+  "RSQLite",
+  "readxl"
+))
+```
+
+## Why SQLite?
+
+There are many database systems, including:
+
+- SQLite
+- PostgreSQL
+- MySQL
+- Microsoft SQL Server
+- Oracle
+
+For learning SQL, SQLite is particularly useful because the entire database can be stored in **one file**.
+
+For example:
+
+> project_database.db
+
+We do not need to install or manage a separate database server.
+
+This makes SQLite an excellent way to learn the fundamentals of SQL while continuing to work within R.
+
+# Connecting to a SQL Database
+
+Before using a database, R needs to establish a connection to it.
+
+We can create a connection using `DBI::dbConnect()`.
+
+```         
+con <- DBI::dbConnect(
+  RSQLite::SQLite(),
+  "project_database.db"
+)
+```
+
+::: callout-tip
+## `con` is short for "connection"
+
+`con` stores the connection between R and the SQL database. We will use this object whenever we want R to interact with the database.
+:::
+
+Here:
+
+- `DBI::dbConnect()` creates the database connection
+- `RSQLite::SQLite()` tells R that we are using SQLite
+- `"project_database.db"` identifies the database file
+
+If the database already exists, R connects to it.
+
+If the database does not exist, SQLite creates it.
+
+## Using a Project Folder
+
+For larger projects, it is often helpful to keep the database inside its own folder.
+
+For example:
+
+```         
+project/
+├── data/
+├── database/
+├── scripts/
+└── analysis.qmd
+```
+
+We could then connect using:
+
+```         
+con <- DBI::dbConnect(
+  RSQLite::SQLite(),
+  file.path("database", "project_database.db")
+)
+```
+
+This creates or connects to:
+
+```         
+database/project_database.db
+```
+
+::: callout-tip
+## Staying organized is key
+
+Creating an R Project helps keep your database, data, scripts, and other related files organized in one place.
+:::
+
+# Exploring a Database
+
+Once connected, one of the first questions we might ask is:
+
+> What tables are in this database?
+
+We can use:
+
+```         
+DBI::dbListTables(con)
+```
+
+For example, imagine our database contains:
+
+```         
+students
+courses
+enrollment
+```
+
+Each of these represents a separate **table** within the same database.
+
+We can examine the fields, or columns, of a table using:
+
+```         
+DBI::dbListFields(con, "students")
+```
+
+We can also retrieve an entire table:
+
+```         
+students <- DBI::dbReadTable(
+  con,
+  "students"
+)
+```
+
+This takes the SQL table and loads it into R as a data frame.
+
+However, one of the major benefits of using a database is that we **do not always need to load the entire table into R**.
+
+Instead, we can ask the database for exactly the information we need.
+
+# Writing SQL in R
+
+SQL queries can be sent directly to the database using `DBI::dbGetQuery()`.
+
+Our first SQL query might be:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students;
+  "
+)
+```
+
+This is actual SQL.
+
+The R code is simply sending the SQL query to our SQLite database.
+
+Let's break it down:
+
+```         
+SELECT *
+FROM students;
+```
+
+`SELECT` tells SQL what information we want.
+
+`*` means all columns.
+
+`FROM students` tells SQL which table we want to use.
+
+Therefore:
+
+```         
+SELECT *
+FROM students;
+```
+
+means:
+
+> Give me every column from the students table.
+
+## Selecting Specific Columns
+
+Often, we do not need every column.
+
+Suppose `students` contains:
+
+- student_id
+- first_name
+- last_name
+- major
+- gpa
+- graduation_year
+
+We could select only the student's name and major:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT first_name, last_name, major
+  FROM students;
+  "
+)
+```
+
+This is an important database principle:
+
+> Only retrieve the information you actually need.
+
+This becomes increasingly important when working with very large databases.
+
+## Filtering Data with WHERE
+
+In R, we might filter observations using `filter()`.
+
+In SQL, we use `WHERE`.
+
+For example:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  WHERE major = 'Psychology';
+  "
+)
+```
+
+We could also filter numeric values:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  WHERE gpa >= 3.5;
+  "
+)
+```
+
+Multiple conditions can be combined using `AND`:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  WHERE major = 'Psychology'
+    AND gpa >= 3.5;
+  "
+)
+```
+
+or `OR`:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  WHERE major = 'Psychology'
+     OR major = 'Biology';
+  "
+)
+```
+
+## Sorting with ORDER BY
+
+SQL uses `ORDER BY` to sort results.
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT first_name, last_name, gpa
+  FROM students
+  ORDER BY gpa DESC;
+  "
+)
+```
+
+`DESC` means descending.
+
+We could instead use:
+
+```         
+ORDER BY gpa ASC
+```
+
+for ascending order.
+
+## Limiting Results
+
+Large databases may contain millions of rows.
+
+Instead of returning everything, SQL allows us to limit our results.
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  LIMIT 10;
+  "
+)
+```
+
+This returns only ten rows.
+
+When exploring unfamiliar databases, `LIMIT` is extremely useful.
+
+## Creating New Variables with SQL
+
+SQL can also perform calculations.
+
+Suppose a table contains:
+
+```         
+player
+games_played
+points
+```
+
+We could calculate points per game:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    player,
+    games_played,
+    points,
+    CAST(points AS REAL) / games_played AS points_per_game
+  FROM player_stats;
+  "
+)
+```
+
+The keyword `AS` creates an alias for our calculated column.
+
+Here:
+
+```         
+AS points_per_game
+```
+
+names the resulting calculation `points_per_game`.
+
+## Summarizing Data
+
+SQL becomes particularly powerful when summarizing data.
+
+Common SQL functions include:
+
+| SQL       | Purpose            |
+|-----------|--------------------|
+| `COUNT()` | Count observations |
+| `SUM()`   | Calculate a total  |
+| `AVG()`   | Calculate a mean   |
+| `MIN()`   | Find the minimum   |
+| `MAX()`   | Find the maximum   |
+
+For example:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT AVG(gpa) AS average_gpa
+  FROM students;
+  "
+)
+```
+
+We could calculate several statistics simultaneously:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    COUNT(*) AS total_students,
+    AVG(gpa) AS average_gpa,
+    MIN(gpa) AS minimum_gpa,
+    MAX(gpa) AS maximum_gpa
+  FROM students;
+  "
+)
+```
+
+## GROUP BY
+
+One of the most important SQL concepts is `GROUP BY`.
+
+Suppose we want the average GPA for each major.
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    major,
+    COUNT(*) AS total_students,
+    AVG(gpa) AS average_gpa
+  FROM students
+  GROUP BY major;
+  "
+)
+```
+
+Conceptually, this is similar to:
+
+```         
+students |>
+  dplyr::group_by(major) |>
+  dplyr::summarise(
+    total_students = dplyr::n(),
+    average_gpa = mean(gpa)
+  )
+```
+
+Learning these relationships can make SQL easier for someone who already understands R.
+
+## SQL Joins
+
+One of the biggest advantages of relational databases is that information can be stored across multiple related tables.
+
+For example, imagine we have:
+
+```         
+students
+courses
+enrollment
+```
+
+Instead of repeating student and course information everywhere, tables can be connected using identifiers.
+
+For example:
+
+```         
+students
+--------
+student_id
+student_name
+major
+```
+
+```         
+enrollment
+----------
+student_id
+course_id
+grade
+```
+
+The variable `student_id` connects the two tables.
+
+## INNER JOIN
+
+An `INNER JOIN` keeps observations that match in both tables.
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    students.student_id,
+    students.student_name,
+    enrollment.course_id,
+    enrollment.grade
+  FROM students
+  INNER JOIN enrollment
+    ON students.student_id = enrollment.student_id;
+  "
+)
+```
+
+## LEFT JOIN
+
+A `LEFT JOIN` keeps all observations from the left table.
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    students.student_id,
+    students.student_name,
+    enrollment.course_id,
+    enrollment.grade
+  FROM students
+  LEFT JOIN enrollment
+    ON students.student_id = enrollment.student_id;
+  "
+)
+```
+
+This is similar to:
+
+```         
+dplyr::left_join(
+  students,
+  enrollment,
+  by = "student_id"
+)
+```
+
+## SQL and dplyr Comparison
+
+| dplyr          | SQL                     |
+|----------------|-------------------------|
+| `select()`     | `SELECT`                |
+| `filter()`     | `WHERE`                 |
+| `arrange()`    | `ORDER BY`              |
+| `group_by()`   | `GROUP BY`              |
+| `summarise()`  | aggregate functions     |
+| `mutate()`     | expressions in `SELECT` |
+| `left_join()`  | `LEFT JOIN`             |
+| `inner_join()` | `INNER JOIN`            |
+| `distinct()`   | `DISTINCT`              |
+
+If you already understand `dplyr`, many SQL concepts should feel familiar.
+
+The major difference is the syntax.
+
+# Saving SQL Results in R
+
+The results of a SQL query can be saved as an R object.
+
+```         
+psych_students <- DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  WHERE major = 'Psychology';
+  "
+)
+```
+
+Now:
+
+```         
+psych_students
+```
+
+is a normal R data frame.
+
+We can continue using R:
+
+```         
+library(ggplot2)
+
+ggplot(
+  psych_students,
+  aes(x = gpa)
+) +
+  geom_histogram()
+```
+
+This illustrates an important workflow:
+
+```         
+SQL Database
+      ↓
+SQL Query
+      ↓
+R Data Frame
+      ↓
+Analysis / Visualization / Modeling
+```
+
+SQL does not replace R.
+
+Instead, SQL can handle the **storage, organization, filtering, joining, and retrieval of data**, while R can handle subsequent analysis.
+
+# Creating a SQL Database from Excel Files
+
+## Checking Our New Database
+
+After creating the database, we should verify that everything worked.
+
+```         
+DBI::dbListTables(con)
+```
+
+We can check the fields:
+
+```         
+DBI::dbListFields(
+  con,
+  "students"
+)
+```
+
+We can check the number of observations:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT COUNT(*) AS total_rows
+  FROM students;
+  "
+)
+```
+
+And preview the data:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  LIMIT 10;
+  "
+)
+```
+
+This verification step is important whenever databases are created programmatically.
+
+## Creating New Tables Using SQL
+
+We can also use SQL itself to create tables.
+
+Suppose we want a table containing only high-performing students.
+
+```         
+DBI::dbExecute(
+  con,
+  "
+  CREATE TABLE high_gpa_students AS
+  SELECT *
+  FROM students
+  WHERE gpa >= 3.5;
+  "
+)
+```
+
+Now:
+
+```         
+DBI::dbListTables(con)
+```
+
+will include:
+
+```         
+high_gpa_students
+```
+
+This introduces an important distinction.
+
+- `dbGetQuery()` is typically used when we want SQL to **return data to R**.
+- `dbExecute()` is typically used when we want SQL to **change something in the database**.
+
+For example:
+
+```         
+CREATE TABLE
+```
+
+```         
+DROP TABLE
+```
+
+```         
+INSERT INTO
+```
+
+```         
+UPDATE
+```
+
+```         
+DELETE
+```
+
+are operations that modify the database.
+
+## Views
+
+Sometimes we want a reusable query without creating another physical copy of the data.
+
+SQL provides **views** for this purpose.
+
+```         
+DBI::dbExecute(
+  con,
+  "
+  CREATE VIEW psychology_students AS
+  SELECT *
+  FROM students
+  WHERE major = 'Psychology';
+  "
+)
+```
+
+We can then query the view:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM psychology_students;
+  "
+)
+```
+
+Views can be extremely useful when a complicated query needs to be reused.
+
+## Using SQL to Join Multiple Excel Files
+
+Suppose our original data came from:
+
+```         
+students.xlsx
+courses.xlsx
+enrollment.xlsx
+```
+
+After placing them into our database, we no longer need to manually merge the Excel files.
+
+Instead, SQL can connect them.
+
+```         
+student_courses <- DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    s.student_id,
+    s.student_name,
+    s.major,
+    c.course_name,
+    e.grade
+  FROM enrollment AS e
+  LEFT JOIN students AS s
+    ON e.student_id = s.student_id
+  LEFT JOIN courses AS c
+    ON e.course_id = c.course_id;
+  "
+)
+```
+
+Notice the use of aliases:
+
+- students AS s
+- courses AS c
+- enrollment AS e
+
+Instead of repeatedly writing:
+
+- students.student_name
+
+we can write:
+
+- s.student_name
+
+Aliases become especially helpful when working with large relational databases.
+
+## Primary and Foreign Keys
+
+Relational databases work best when tables have clearly defined relationships.
+
+Consider:
+
+```         
+students
+--------
+student_id
+student_name
+major
+```
+
+and:
+
+```         
+enrollment
+----------
+student_id
+course_id
+grade
+```
+
+`student_id` uniquely identifies students in the `students` table.
+
+This is conceptually the **primary key**.
+
+The `student_id` appearing in `enrollment` connects enrollment records back to students.
+
+This acts as a **foreign key**.
+
+Understanding these relationships is essential when designing databases.
+
+A useful question to ask when creating each table is:
+
+> What uniquely identifies one row?
+
+- For students: `student_id`
+
+- For courses: `course_id`
+
+- For games: `game_id`
+
+- For players: `player_id`
+
+Well-designed identifiers make SQL joins considerably easier and safer.
+
+# A More Realistic Database Workflow
+
+In a real project, we might receive several raw files:
+
+```         
+data/
+├── students.xlsx
+├── courses.xlsx
+├── enrollment.xlsx
+└── instructors.xlsx
+```
+
+We import them into R:
+
+```         
+Excel
+  ↓
+R
+```
+
+Then create a relational database:
+
+```         
+R
+  ↓
+SQLite
+```
+
+The resulting database might look like:
+
+```         
+project_database.db
+
+students
+   │
+   └── student_id
+          │
+          ▼
+      enrollment
+          ▲
+          │
+       course_id
+          │
+       courses
+```
+
+We can then use SQL for:
+
+```         
+SELECT
+WHERE
+ORDER BY
+GROUP BY
+JOIN
+CREATE TABLE
+CREATE VIEW
+```
+
+and bring the resulting data into R when needed for:
+
+- ggplot2
+- statistical analysis
+- modeling
+- reporting
+- Quarto
+- Shiny
+
+This creates a complete workflow:
+
+```         
+Raw Files
+    ↓
+R Import / Cleaning
+    ↓
+SQLite Database
+    ↓
+SQL Queries
+    ↓
+Analysis in R
+    ↓
+Quarto / Shiny / Reports
+```
+
+# Closing the Database Connection
+
+When we finish working with a database, we should disconnect from it.
+
+```         
+DBI::dbDisconnect(con)
+```
+
+For scripts that create database connections, we can also use:
+
+```         
+on.exit(
+  DBI::dbDisconnect(con),
+  add = TRUE
+)
+```
+
+This helps ensure that the database connection is closed when the script finishes.
+
+# Putting Everything Together
+
+A basic database creation script might therefore look like:
+
+```         
+library(DBI)
+library(RSQLite)
+library(readxl)
+
+# Import data
+
+students <- readxl::read_excel(
+  file.path("data", "students.xlsx")
+)
+
+courses <- readxl::read_excel(
+  file.path("data", "courses.xlsx")
+)
+
+enrollment <- readxl::read_excel(
+  file.path("data", "enrollment.xlsx")
+)
+
+# Connect to database
+
+con <- DBI::dbConnect(
+  RSQLite::SQLite(),
+  file.path("database", "project_database.db")
+)
+
+on.exit(
+  DBI::dbDisconnect(con),
+  add = TRUE
+)
+
+# Write tables
+
+DBI::dbWriteTable(
+  con,
+  "students",
+  students,
+  overwrite = TRUE
+)
+
+DBI::dbWriteTable(
+  con,
+  "courses",
+  courses,
+  overwrite = TRUE
+)
+
+DBI::dbWriteTable(
+  con,
+  "enrollment",
+  enrollment,
+  overwrite = TRUE
+)
+
+# Verify database
+
+DBI::dbListTables(con)
+
+message("SQLite database created.")
+```
+
+At this point, the Excel files have become tables within a SQL database.
+
+We can now work with them using SQL:
+
+```         
+DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    s.student_name,
+    s.major,
+    c.course_name,
+    e.grade
+  FROM enrollment AS e
+  LEFT JOIN students AS s
+    ON e.student_id = s.student_id
+  LEFT JOIN courses AS c
+    ON e.course_id = c.course_id
+  ORDER BY s.student_name;
+  "
+)
+```
+
+# SQL Skills to Practice
+
+Once you are comfortable creating and connecting to databases, practice these SQL concepts in roughly this order:
+
+1.  `SELECT`
+2.  `FROM`
+3.  `WHERE`
+4.  `ORDER BY`
+5.  `LIMIT`
+6.  `DISTINCT`
+7.  `COUNT()`, `AVG()`, `SUM()`, `MIN()`, `MAX()`
+8.  `GROUP BY`
+9.  `HAVING`
+10. `CASE WHEN`
+11. `INNER JOIN`
+12. `LEFT JOIN`
+13. Multiple joins
+14. Subqueries
+15. Common Table Expressions (`WITH`)
+16. Window functions
+17. `CREATE TABLE`
+18. `CREATE VIEW`
+19. `INSERT`
+20. `UPDATE` and `DELETE`
+
+These concepts represent a strong foundation for using SQL in real analytical work.
+
+# Conclusion
+
+Learning SQL does not require abandoning R.
+
+Instead, R can serve as the environment where we connect to databases, send SQL queries, retrieve results, and continue our analysis.
+
+::: callout-tip
+## For someone already familiar with R, a useful way to think about the relationship is:
+
+- R = analysis environment
+- SQL = language for working with relational data
+- SQLite = database storing the data
+- DBI = bridge connecting R and the database
+:::
+
+Together, these tools allow us to move from individual files toward more structured and scalable data workflows.
+
+Perhaps most importantly, the SQL written through `DBI::dbGetQuery()` is **real SQL**. The same fundamental concepts—`SELECT`, `WHERE`, `GROUP BY`, `JOIN`, subqueries, CTEs, and window functions—carry into database systems such as PostgreSQL, MySQL, SQL Server, and others.
+
+The database system may eventually change.
+
+*The SQL skills remain.*
+
+# Key Takeaways
+
+- A *database*- an organized collection of data that can contain multiple related tables.
+- *SQL (Structured Query Language)*- the language used to communicate with and work with databases.
+- *SQLite*- allows an entire database to be stored as a single `.db` file, making it a useful database system for working with SQL in R.
+- The `DBI` package provides the connection between R and a database, while `RSQLite` allows R to work specifically with SQLite databases.
+- Use `DBI::dbConnect()` to connect to an existing SQLite database or create a new one.
+- Use `DBI::dbListTables()` and `DBI::dbListFields()` to explore the tables and columns available within a database.
+- Use `DBI::dbReadTable()` to load an entire database table into R as a data frame.
+- Use `DBI::dbGetQuery()` to send SQL queries to a database and return the results to R.
+- SQL commands such as `SELECT`, `WHERE`, `ORDER BY`, `LIMIT`, and `GROUP BY` allow us to retrieve, filter, sort, limit, and summarize data.
+- SQL aggregate functions such as `COUNT()`, `SUM()`, `AVG()`, `MIN()`, and `MAX()` allow us to summarize information directly within the database.
+- `INNER JOIN` and `LEFT JOIN` allow information from multiple related tables to be combined using shared identifiers.
+- *Primary keys*- uniquely identify observations within a table, while *foreign keys*- allow tables to be related to one another.
+- Existing Excel files can be imported into R using `read_excel()` and added as tables within a SQLite database using `DBI::dbWriteTable()`.
+- Use `DBI::dbExecute()` when SQL should modify the database rather than simply return results.
+- SQL can be used to create new tables and views directly within a database.
+- Use `DBI::dbDisconnect()` when you are finished working with a database.
+- SQL does not replace R. SQL can handle data storage, retrieval, filtering, summarizing, and joining, while the resulting data can still be analyzed, visualized, and reported using R.
+
+# Checklist
+
+## Connecting to and Exploring a Database
+
+- [ ] Installed and loaded `DBI` and `RSQLite`
+- [ ] Created or identified the SQLite `.db` file
+- [ ] Connected to the database using `DBI::dbConnect()`
+- [ ] Stored the connection as an object such as `con`
+- [ ] Checked the available tables using `DBI::dbListTables()`
+- [ ] Examined table columns using `DBI::dbListFields()`
+- [ ] Previewed tables before beginning an analysis
+- [ ] Used `DBI::dbReadTable()` when an entire table needed to be loaded into R
+
+## Working with SQL
+
+- [ ] Used `SELECT` to choose the columns to retrieve
+- [ ] Used `FROM` to identify the table being queried
+- [ ] Used `WHERE` to filter observations
+- [ ] Combined multiple conditions using `AND` or `OR`
+- [ ] Used `ORDER BY` to sort query results
+- [ ] Used `LIMIT` when only a small number of rows were needed
+- [ ] Used `COUNT()`, `SUM()`, `AVG()`, `MIN()`, or `MAX()` to summarize data
+- [ ] Used `GROUP BY` when summaries were needed for different groups
+- [ ] Used `AS` to create clear aliases for columns, calculations, or tables
+- [ ] Used `INNER JOIN` or `LEFT JOIN` to combine related tables
+- [ ] Checked that tables were joined using the correct identifying variables
+- [ ] Saved SQL query results as R objects when additional analysis was needed
+
+## Creating and Managing a Database
+
+- [ ] Organized raw files, databases, scripts, and reports within the R Project
+- [ ] Imported Excel files into R using `read_excel()`
+- [ ] Determined which datasets should become separate database tables
+- [ ] Identified variables that uniquely identify observations within each table
+- [ ] Identified relationships between tables using shared identifiers
+- [ ] Created or connected to the SQLite database
+- [ ] Added R data frames to the database using `DBI::dbWriteTable()`
+- [ ] Verified newly created tables using `DBI::dbListTables()`
+- [ ] Checked the fields and number of observations in newly created tables
+- [ ] Used `DBI::dbExecute()` when creating or modifying database objects
+- [ ] Created a table or view using SQL when appropriate
+- [ ] Disconnected from the database using `DBI::dbDisconnect()` when finished
+
+# Key Functions & Commands
+
+The following R functions and SQL commands are introduced or reinforced in this guide to support database creation, exploration, querying, and management.
+
+## R Functions
+
+- `DBI::dbConnect()`: Creates a connection between R and a database.
+- `RSQLite::SQLite()`: Specifies SQLite as the database system when establishing a connection.
+- `DBI::dbListTables()`: Lists the tables available within a connected database.
+- `DBI::dbListFields()`: Lists the fields, or columns, contained within a database table.
+- `DBI::dbReadTable()`: Reads an entire database table into R as a data frame.
+- `DBI::dbGetQuery()`: Sends a SQL query to the database and returns the resulting data to R.
+- `DBI::dbWriteTable()`: Writes an R data frame to the database as a table.
+- `DBI::dbExecute()`: Executes SQL statements that modify the database rather than returning a dataset.
+- `DBI::dbDisconnect()`: Closes the connection between R and the database.
+- `readxl::read_excel()`: Imports an Excel file into R before it is added to the database.
+- `file.path()`: Creates file paths in a way that works across operating systems and is useful for organizing database projects.
+
+## SQL Commands
+
+- `SELECT`: Specifies the columns or information that should be returned by a query.
+- `FROM`: Identifies the table from which data should be retrieved.
+- `WHERE`: Filters rows based on one or more conditions.
+- `AND` / `OR`: Combines multiple filtering conditions.
+- `ORDER BY`: Sorts query results according to one or more columns.
+- `ASC` / `DESC`: Specifies whether results should be sorted in ascending or descending order.
+- `LIMIT`: Restricts the number of rows returned by a query.
+- `AS`: Creates an alias for a column, calculation, or table.
+- `COUNT()`: Counts observations.
+- `SUM()`: Calculates the total of a numeric column.
+- `AVG()`: Calculates the average of a numeric column.
+- `MIN()`: Returns the minimum value of a column.
+- `MAX()`: Returns the maximum value of a column.
+- `GROUP BY`: Groups observations so that summary calculations can be performed separately for each group.
+- `INNER JOIN`: Combines tables while keeping only observations that match in both tables.
+- `LEFT JOIN`: Combines tables while keeping all observations from the left table and matching information from the right table when available.
+- `ON`: Specifies the variables used to connect tables during a SQL join.
+- `CREATE TABLE`: Creates a new table within the database.
+- `CREATE VIEW`: Creates a reusable SQL query that can be queried similarly to a table without creating another physical copy of the data.
+- `CAST()`: Converts a value from one data type to another.
+- `DROP TABLE`: Removes a table from the database.
+- `INSERT INTO`: Adds new records to an existing database table.
+- `UPDATE`: Modifies existing records within a table.
+- `DELETE`: Removes records from a table.

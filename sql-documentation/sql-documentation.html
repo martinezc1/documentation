@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Using SQL in R</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="sql-documentation_files/libs/clipboard/clipboard.min.js"></script>
+<script src="sql-documentation_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="sql-documentation_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="sql-documentation_files/libs/quarto-html/popper.min.js"></script>
+<script src="sql-documentation_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="sql-documentation_files/libs/quarto-html/anchor.min.js"></script>
+<link href="sql-documentation_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="sql-documentation_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="sql-documentation_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="sql-documentation_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="sql-documentation_files/libs/bootstrap/bootstrap-cb6558daf035ca6ff986cccc73754e6e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#before-we-start-what-are-sql-and-databases" id="toc-before-we-start-what-are-sql-and-databases" class="nav-link" data-scroll-target="#before-we-start-what-are-sql-and-databases"><span class="header-section-number">2</span> Before We Start: What Are SQL and Databases?</a>
+  <ul class="collapse">
+  <li><a href="#what-is-a-database" id="toc-what-is-a-database" class="nav-link" data-scroll-target="#what-is-a-database"><span class="header-section-number">2.1</span> What is a Database?</a></li>
+  <li><a href="#what-is-sql" id="toc-what-is-sql" class="nav-link" data-scroll-target="#what-is-sql"><span class="header-section-number">2.2</span> What is SQL?</a></li>
+  <li><a href="#so-where-does-r-come-in" id="toc-so-where-does-r-come-in" class="nav-link" data-scroll-target="#so-where-does-r-come-in"><span class="header-section-number">2.3</span> So Where Does R Come In?</a></li>
+  </ul></li>
+  <li><a href="#packages" id="toc-packages" class="nav-link" data-scroll-target="#packages"><span class="header-section-number">3</span> Packages</a>
+  <ul class="collapse">
+  <li><a href="#why-sqlite" id="toc-why-sqlite" class="nav-link" data-scroll-target="#why-sqlite"><span class="header-section-number">3.1</span> Why SQLite?</a></li>
+  </ul></li>
+  <li><a href="#connecting-to-a-sql-database" id="toc-connecting-to-a-sql-database" class="nav-link" data-scroll-target="#connecting-to-a-sql-database"><span class="header-section-number">4</span> Connecting to a SQL Database</a>
+  <ul class="collapse">
+  <li><a href="#using-a-project-folder" id="toc-using-a-project-folder" class="nav-link" data-scroll-target="#using-a-project-folder"><span class="header-section-number">4.1</span> Using a Project Folder</a></li>
+  </ul></li>
+  <li><a href="#exploring-a-database" id="toc-exploring-a-database" class="nav-link" data-scroll-target="#exploring-a-database"><span class="header-section-number">5</span> Exploring a Database</a></li>
+  <li><a href="#writing-sql-in-r" id="toc-writing-sql-in-r" class="nav-link" data-scroll-target="#writing-sql-in-r"><span class="header-section-number">6</span> Writing SQL in R</a>
+  <ul class="collapse">
+  <li><a href="#selecting-specific-columns" id="toc-selecting-specific-columns" class="nav-link" data-scroll-target="#selecting-specific-columns"><span class="header-section-number">6.1</span> Selecting Specific Columns</a></li>
+  <li><a href="#filtering-data-with-where" id="toc-filtering-data-with-where" class="nav-link" data-scroll-target="#filtering-data-with-where"><span class="header-section-number">6.2</span> Filtering Data with WHERE</a></li>
+  <li><a href="#sorting-with-order-by" id="toc-sorting-with-order-by" class="nav-link" data-scroll-target="#sorting-with-order-by"><span class="header-section-number">6.3</span> Sorting with ORDER BY</a></li>
+  <li><a href="#limiting-results" id="toc-limiting-results" class="nav-link" data-scroll-target="#limiting-results"><span class="header-section-number">6.4</span> Limiting Results</a></li>
+  <li><a href="#creating-new-variables-with-sql" id="toc-creating-new-variables-with-sql" class="nav-link" data-scroll-target="#creating-new-variables-with-sql"><span class="header-section-number">6.5</span> Creating New Variables with SQL</a></li>
+  <li><a href="#summarizing-data" id="toc-summarizing-data" class="nav-link" data-scroll-target="#summarizing-data"><span class="header-section-number">6.6</span> Summarizing Data</a></li>
+  <li><a href="#group-by" id="toc-group-by" class="nav-link" data-scroll-target="#group-by"><span class="header-section-number">6.7</span> GROUP BY</a></li>
+  <li><a href="#sql-joins" id="toc-sql-joins" class="nav-link" data-scroll-target="#sql-joins"><span class="header-section-number">6.8</span> SQL Joins</a></li>
+  <li><a href="#inner-join" id="toc-inner-join" class="nav-link" data-scroll-target="#inner-join"><span class="header-section-number">6.9</span> INNER JOIN</a></li>
+  <li><a href="#left-join" id="toc-left-join" class="nav-link" data-scroll-target="#left-join"><span class="header-section-number">6.10</span> LEFT JOIN</a></li>
+  <li><a href="#sql-and-dplyr-comparison" id="toc-sql-and-dplyr-comparison" class="nav-link" data-scroll-target="#sql-and-dplyr-comparison"><span class="header-section-number">6.11</span> SQL and dplyr Comparison</a></li>
+  </ul></li>
+  <li><a href="#saving-sql-results-in-r" id="toc-saving-sql-results-in-r" class="nav-link" data-scroll-target="#saving-sql-results-in-r"><span class="header-section-number">7</span> Saving SQL Results in R</a></li>
+  <li><a href="#creating-a-sql-database-from-excel-files" id="toc-creating-a-sql-database-from-excel-files" class="nav-link" data-scroll-target="#creating-a-sql-database-from-excel-files"><span class="header-section-number">8</span> Creating a SQL Database from Excel Files</a>
+  <ul class="collapse">
+  <li><a href="#checking-our-new-database" id="toc-checking-our-new-database" class="nav-link" data-scroll-target="#checking-our-new-database"><span class="header-section-number">8.1</span> Checking Our New Database</a></li>
+  <li><a href="#creating-new-tables-using-sql" id="toc-creating-new-tables-using-sql" class="nav-link" data-scroll-target="#creating-new-tables-using-sql"><span class="header-section-number">8.2</span> Creating New Tables Using SQL</a></li>
+  <li><a href="#views" id="toc-views" class="nav-link" data-scroll-target="#views"><span class="header-section-number">8.3</span> Views</a></li>
+  <li><a href="#using-sql-to-join-multiple-excel-files" id="toc-using-sql-to-join-multiple-excel-files" class="nav-link" data-scroll-target="#using-sql-to-join-multiple-excel-files"><span class="header-section-number">8.4</span> Using SQL to Join Multiple Excel Files</a></li>
+  <li><a href="#primary-and-foreign-keys" id="toc-primary-and-foreign-keys" class="nav-link" data-scroll-target="#primary-and-foreign-keys"><span class="header-section-number">8.5</span> Primary and Foreign Keys</a></li>
+  </ul></li>
+  <li><a href="#a-more-realistic-database-workflow" id="toc-a-more-realistic-database-workflow" class="nav-link" data-scroll-target="#a-more-realistic-database-workflow"><span class="header-section-number">9</span> A More Realistic Database Workflow</a></li>
+  <li><a href="#closing-the-database-connection" id="toc-closing-the-database-connection" class="nav-link" data-scroll-target="#closing-the-database-connection"><span class="header-section-number">10</span> Closing the Database Connection</a></li>
+  <li><a href="#putting-everything-together" id="toc-putting-everything-together" class="nav-link" data-scroll-target="#putting-everything-together"><span class="header-section-number">11</span> Putting Everything Together</a></li>
+  <li><a href="#sql-skills-to-practice" id="toc-sql-skills-to-practice" class="nav-link" data-scroll-target="#sql-skills-to-practice"><span class="header-section-number">12</span> SQL Skills to Practice</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">13</span> Conclusion</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">14</span> Key Takeaways</a></li>
+  <li><a href="#checklist" id="toc-checklist" class="nav-link" data-scroll-target="#checklist"><span class="header-section-number">15</span> Checklist</a>
+  <ul class="collapse">
+  <li><a href="#connecting-to-and-exploring-a-database" id="toc-connecting-to-and-exploring-a-database" class="nav-link" data-scroll-target="#connecting-to-and-exploring-a-database"><span class="header-section-number">15.1</span> Connecting to and Exploring a Database</a></li>
+  <li><a href="#working-with-sql" id="toc-working-with-sql" class="nav-link" data-scroll-target="#working-with-sql"><span class="header-section-number">15.2</span> Working with SQL</a></li>
+  <li><a href="#creating-and-managing-a-database" id="toc-creating-and-managing-a-database" class="nav-link" data-scroll-target="#creating-and-managing-a-database"><span class="header-section-number">15.3</span> Creating and Managing a Database</a></li>
+  </ul></li>
+  <li><a href="#key-functions-commands" id="toc-key-functions-commands" class="nav-link" data-scroll-target="#key-functions-commands"><span class="header-section-number">16</span> Key Functions &amp; Commands</a>
+  <ul class="collapse">
+  <li><a href="#r-functions" id="toc-r-functions" class="nav-link" data-scroll-target="#r-functions"><span class="header-section-number">16.1</span> R Functions</a></li>
+  <li><a href="#sql-commands" id="toc-sql-commands" class="nav-link" data-scroll-target="#sql-commands"><span class="header-section-number">16.2</span> SQL Commands</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Using SQL in R</h1>
+<p class="subtitle lead">A Practical Introduction to Databases, SQL, and R</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<hr>
+<section id="introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>R is commonly used for data analysis, visualization, and statistical programming. However, R can also interact directly with&nbsp;<strong>SQL databases</strong>.</p>
+<p>This means that we can use R as our primary working environment while still learning and writing real SQL code.</p>
+<p>This guide provides an introduction to using SQL within R. We will focus on three major skills:</p>
+<ol type="1">
+<li><strong>Connecting to and loading an existing SQL database</strong></li>
+<li><strong>Using SQL to explore, filter, summarize, and join database tables</strong></li>
+<li><strong>Creating SQL databases and tables from existing files</strong></li>
+</ol>
+<p>By the end of this guide, you should be able to take several separate datasets, combine them into a relational database, and use SQL to work with those datasets directly from R.</p>
+<p>Importantly, the SQL code used throughout this guide is actual SQL. Although R is being used to connect to the database, the database itself is still processing SQL queries.</p>
+<hr>
+</section>
+<section id="before-we-start-what-are-sql-and-databases" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Before We Start: What Are SQL and Databases?</h1>
+<p>Before writing any code, let’s quickly define two terms that will appear throughout this guide:&nbsp;<strong>database</strong>&nbsp;and&nbsp;<strong>SQL</strong>.</p>
+<p>Don’t worry—we’ll keep this simple!</p>
+<section id="what-is-a-database" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="what-is-a-database"><span class="header-section-number">2.1</span> What is a Database?</h2>
+<p>A&nbsp;<strong>database</strong>&nbsp;is an organized collection of data stored in one place.</p>
+<p>If you’ve worked with Excel or R before, you already understand much of the basic idea.</p>
+<p>Imagine you have three Excel files:</p>
+<ol type="1">
+<li>students.xlsx</li>
+<li>courses.xlsx</li>
+<li>enrollment.xlsx</li>
+</ol>
+<p>Each file contains different—but related—information.</p>
+<p>Instead of keeping these as three separate files, we could store them inside&nbsp;<strong>one database</strong>:</p>
+<pre><code>school_database.db
+│
+├── students
+├── courses
+└── enrollment</code></pre>
+<p>Each of these is called a&nbsp;<strong>table</strong>.</p>
+<p>If you’re familiar with R, you can think of a database table as being similar to a data frame:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Database</th>
+<th>R</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Database</td>
+<td>Collection of related data</td>
+</tr>
+<tr class="even">
+<td>Table</td>
+<td>Data frame</td>
+</tr>
+<tr class="odd">
+<td>Column</td>
+<td>Variable</td>
+</tr>
+<tr class="even">
+<td>Row</td>
+<td>Observation</td>
+</tr>
+</tbody>
+</table>
+<p>The important difference is that a database allows us to store&nbsp;<strong>many related tables together</strong>&nbsp;and easily work across them.</p>
+<p>For example, our&nbsp;<code>students</code>&nbsp;table might contain:</p>
+<pre><code>student_id | student_name | major
+-----------|--------------|------------
+001        | Alex         | Psychology
+002        | Taylor       | Biology
+003        | Jordan       | Psychology</code></pre>
+<p>while&nbsp;<code>enrollment</code>&nbsp;might contain:</p>
+<pre><code>student_id | course_id | grade
+-----------|-----------|------
+001        | PSY101    | 92
+001        | PSY200    | 88
+002        | BIO101    | 95</code></pre>
+<p>Notice that both tables contain&nbsp;<code>student_id</code>.</p>
+<p>That allows us to connect information across the database without needing to store everything in one enormous table.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think of a database as a container
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A database can contain many tables. Those tables can contain different types of information while still being connected to one another.<br>
+</p>
+</div>
+</div>
+</section>
+<section id="what-is-sql" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="what-is-sql"><span class="header-section-number">2.2</span> What is SQL?</h2>
+<p><strong>SQL</strong>&nbsp;stands for&nbsp;<strong>Structured Query Language</strong>.</p>
+<p>SQL is a language used to communicate with databases.</p>
+<p>That’s really the main idea!</p>
+<p>We can use SQL to ask a database questions such as:</p>
+<ul>
+<li>Give me every student.</li>
+<li>Give me only Psychology students.</li>
+<li>What is the average grade?</li>
+<li>Which students are enrolled in each course?</li>
+<li>Combine the student information with their enrollment information.</li>
+</ul>
+<p>For example, this SQL code:</p>
+<pre><code>SELECT *
+FROM students;</code></pre>
+<p>essentially means:</p>
+<blockquote class="blockquote">
+<p>Give me everything from the&nbsp;<code>students</code>&nbsp;table.</p>
+</blockquote>
+<p>We can make our request more specific:</p>
+<pre><code>SELECT *
+FROM students
+WHERE major = 'Psychology';</code></pre>
+<p>which means:</p>
+<blockquote class="blockquote">
+<p>Give me all students whose major is Psychology.</p>
+</blockquote>
+<p>If you already know&nbsp;<code>dplyr</code>, SQL will probably look surprisingly familiar.</p>
+<p>For example, in R we might write:</p>
+<pre><code>students |&gt;
+  filter(major == "Psychology") |&gt;
+  select(student_id, student_name)</code></pre>
+<p>In SQL, we could write:</p>
+<pre><code>SELECT student_id, student_name
+FROM students
+WHERE major = 'Psychology';</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>SQL is the language, not the database
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A&nbsp;<strong>database</strong>&nbsp;stores and organizes the data.</p>
+<p><strong>SQL</strong>&nbsp;is the language we use to communicate with that database.</p>
+<p>Throughout this guide, we will use&nbsp;<strong>SQLite</strong>&nbsp;as our database system and&nbsp;<strong>SQL</strong>&nbsp;as the language used to work with it.<br>
+</p>
+</div>
+</div>
+</section>
+<section id="so-where-does-r-come-in" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="so-where-does-r-come-in"><span class="header-section-number">2.3</span> So Where Does R Come In?</h2>
+<p>This is where everything comes together.</p>
+<p>Normally, SQL can be written using dedicated database software. However, since we already know R, we don’t need to completely change our workflow just to start learning SQL.</p>
+<p>Instead, we can use R to connect to a database and send SQL commands to it.</p>
+<p>Our basic workflow will look something like this:</p>
+<pre><code>          R
+          │
+          ▼
+    SQL Connection
+          │
+          ▼
+   ┌──────────────┐
+   │   Database   │
+   ├──────────────┤
+   │ students     │
+   │ courses      │
+   │ enrollment   │
+   └──────────────┘
+          │
+          ▼
+     SQL Query
+          │
+          ▼
+      Results
+          │
+          ▼
+          R</code></pre>
+<p>This gives us the best of both worlds.</p>
+<p>We can use&nbsp;<strong>SQL</strong>&nbsp;to store, retrieve, filter, summarize, and combine data, while continuing to use&nbsp;<strong>R</strong>&nbsp;for visualization, statistical analysis, modeling, reporting, and everything else we already know how to do.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>TL;DR
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><strong>Database:</strong>&nbsp;Where our organized data lives.</li>
+<li><strong>Table:</strong>&nbsp;A dataset inside the database, similar to an R data frame.</li>
+<li><strong>SQL:</strong>&nbsp;The language we use to communicate with the database.</li>
+<li><strong>SQLite:</strong>&nbsp;The database system we will use in this guide.</li>
+<li><strong>R:</strong>&nbsp;The environment we will use to connect everything together.</li>
+</ol>
+</div>
+</div>
+</section>
+</section>
+<section id="packages" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Packages</h1>
+<p>We will primarily use three packages:</p>
+<pre><code>library(DBI)
+library(RSQLite)
+library(readxl)</code></pre>
+<ul>
+<li><code>DBI</code>&nbsp;package provides a common interface between R and database systems.</li>
+<li><code>RSQLite</code>&nbsp;allows us to create and interact with&nbsp;<strong>SQLite databases</strong>.</li>
+<li><code>readxl</code>&nbsp;allows us to import Excel files into R before adding them to our database.</li>
+</ul>
+<p>If these packages are not installed, they can be installed using:</p>
+<pre><code>install.packages(c(
+  "DBI",
+  "RSQLite",
+  "readxl"
+))</code></pre>
+<section id="why-sqlite" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="why-sqlite"><span class="header-section-number">3.1</span> Why SQLite?</h2>
+<p>There are many database systems, including:</p>
+<ul>
+<li>SQLite</li>
+<li>PostgreSQL</li>
+<li>MySQL</li>
+<li>Microsoft SQL Server</li>
+<li>Oracle</li>
+</ul>
+<p>For learning SQL, SQLite is particularly useful because the entire database can be stored in&nbsp;<strong>one file</strong>.</p>
+<p>For example:</p>
+<blockquote class="blockquote">
+<p>project_database.db</p>
+</blockquote>
+<p>We do not need to install or manage a separate database server.</p>
+<p>This makes SQLite an excellent way to learn the fundamentals of SQL while continuing to work within R.</p>
+</section>
+</section>
+<section id="connecting-to-a-sql-database" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Connecting to a SQL Database</h1>
+<p>Before using a database, R needs to establish a connection to it.</p>
+<p>We can create a connection using&nbsp;<code>DBI::dbConnect()</code>.</p>
+<pre><code>con &lt;- DBI::dbConnect(
+  RSQLite::SQLite(),
+  "project_database.db"
+)</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span><code>con</code> is short for “connection”
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>con</code> stores the connection between R and the SQL database. We will use this object whenever we want R to interact with the database.</p>
+</div>
+</div>
+<p>Here:</p>
+<ul>
+<li><code>DBI::dbConnect()</code>&nbsp;creates the database connection</li>
+<li><code>RSQLite::SQLite()</code>&nbsp;tells R that we are using SQLite</li>
+<li><code>"project_database.db"</code>&nbsp;identifies the database file</li>
+</ul>
+<p>If the database already exists, R connects to it.</p>
+<p>If the database does not exist, SQLite creates it.</p>
+<section id="using-a-project-folder" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="using-a-project-folder"><span class="header-section-number">4.1</span> Using a Project Folder</h2>
+<p>For larger projects, it is often helpful to keep the database inside its own folder.</p>
+<p>For example:</p>
+<pre><code>project/
+├── data/
+├── database/
+├── scripts/
+└── analysis.qmd</code></pre>
+<p>We could then connect using:</p>
+<pre><code>con &lt;- DBI::dbConnect(
+  RSQLite::SQLite(),
+  file.path("database", "project_database.db")
+)</code></pre>
+<p>This creates or connects to:</p>
+<pre><code>database/project_database.db</code></pre>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Staying organized is key
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Creating an R Project helps keep your database, data, scripts, and other related files organized in one place.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="exploring-a-database" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Exploring a Database</h1>
+<p>Once connected, one of the first questions we might ask is:</p>
+<blockquote class="blockquote">
+<p>What tables are in this database?</p>
+</blockquote>
+<p>We can use:</p>
+<pre><code>DBI::dbListTables(con)</code></pre>
+<p>For example, imagine our database contains:</p>
+<pre><code>students
+courses
+enrollment</code></pre>
+<p>Each of these represents a separate&nbsp;<strong>table</strong>&nbsp;within the same database.</p>
+<p>We can examine the fields, or columns, of a table using:</p>
+<pre><code>DBI::dbListFields(con, "students")</code></pre>
+<p>We can also retrieve an entire table:</p>
+<pre><code>students &lt;- DBI::dbReadTable(
+  con,
+  "students"
+)</code></pre>
+<p>This takes the SQL table and loads it into R as a data frame.</p>
+<p>However, one of the major benefits of using a database is that we&nbsp;<strong>do not always need to load the entire table into R</strong>.</p>
+<p>Instead, we can ask the database for exactly the information we need.</p>
+</section>
+<section id="writing-sql-in-r" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Writing SQL in R</h1>
+<p>SQL queries can be sent directly to the database using&nbsp;<code>DBI::dbGetQuery()</code>.</p>
+<p>Our first SQL query might be:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students;
+  "
+)</code></pre>
+<p>This is actual SQL.</p>
+<p>The R code is simply sending the SQL query to our SQLite database.</p>
+<p>Let’s break it down:</p>
+<pre><code>SELECT *
+FROM students;</code></pre>
+<p><code>SELECT</code>&nbsp;tells SQL what information we want.</p>
+<p><code>*</code>&nbsp;means all columns.</p>
+<p><code>FROM students</code>&nbsp;tells SQL which table we want to use.</p>
+<p>Therefore:</p>
+<pre><code>SELECT *
+FROM students;</code></pre>
+<p>means:</p>
+<blockquote class="blockquote">
+<p>Give me every column from the students table.</p>
+</blockquote>
+<section id="selecting-specific-columns" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="selecting-specific-columns"><span class="header-section-number">6.1</span> Selecting Specific Columns</h2>
+<p>Often, we do not need every column.</p>
+<p>Suppose&nbsp;<code>students</code>&nbsp;contains:</p>
+<ul>
+<li>student_id</li>
+<li>first_name</li>
+<li>last_name</li>
+<li>major</li>
+<li>gpa</li>
+<li>graduation_year</li>
+</ul>
+<p>We could select only the student’s name and major:</p>
+<pre class="{text}"><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT first_name, last_name, major
+  FROM students;
+  "
+)</code></pre>
+<p>This is an important database principle:</p>
+<blockquote class="blockquote">
+<p>Only retrieve the information you actually need.</p>
+</blockquote>
+<p>This becomes increasingly important when working with very large databases.</p>
+</section>
+<section id="filtering-data-with-where" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="filtering-data-with-where"><span class="header-section-number">6.2</span> Filtering Data with WHERE</h2>
+<p>In R, we might filter observations using&nbsp;<code>filter()</code>.</p>
+<p>In SQL, we use&nbsp;<code>WHERE</code>.</p>
+<p>For example:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  WHERE major = 'Psychology';
+  "
+)</code></pre>
+<p>We could also filter numeric values:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  WHERE gpa &gt;= 3.5;
+  "
+)</code></pre>
+<p>Multiple conditions can be combined using&nbsp;<code>AND</code>:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  WHERE major = 'Psychology'
+    AND gpa &gt;= 3.5;
+  "
+)</code></pre>
+<p>or&nbsp;<code>OR</code>:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  WHERE major = 'Psychology'
+     OR major = 'Biology';
+  "
+)</code></pre>
+</section>
+<section id="sorting-with-order-by" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="sorting-with-order-by"><span class="header-section-number">6.3</span> Sorting with ORDER BY</h2>
+<p>SQL uses&nbsp;<code>ORDER BY</code>&nbsp;to sort results.</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT first_name, last_name, gpa
+  FROM students
+  ORDER BY gpa DESC;
+  "
+)</code></pre>
+<p><code>DESC</code>&nbsp;means descending.</p>
+<p>We could instead use:</p>
+<pre><code>ORDER BY gpa ASC</code></pre>
+<p>for ascending order.</p>
+</section>
+<section id="limiting-results" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="limiting-results"><span class="header-section-number">6.4</span> Limiting Results</h2>
+<p>Large databases may contain millions of rows.</p>
+<p>Instead of returning everything, SQL allows us to limit our results.</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  LIMIT 10;
+  "
+)</code></pre>
+<p>This returns only ten rows.</p>
+<p>When exploring unfamiliar databases,&nbsp;<code>LIMIT</code>&nbsp;is extremely useful.</p>
+</section>
+<section id="creating-new-variables-with-sql" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="creating-new-variables-with-sql"><span class="header-section-number">6.5</span> Creating New Variables with SQL</h2>
+<p>SQL can also perform calculations.</p>
+<p>Suppose a table contains:</p>
+<pre><code>player
+games_played
+points</code></pre>
+<p>We could calculate points per game:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    player,
+    games_played,
+    points,
+    CAST(points AS REAL) / games_played AS points_per_game
+  FROM player_stats;
+  "
+)</code></pre>
+<p>The keyword&nbsp;<code>AS</code>&nbsp;creates an alias for our calculated column.</p>
+<p>Here:</p>
+<pre><code>AS points_per_game</code></pre>
+<p>names the resulting calculation&nbsp;<code>points_per_game</code>.</p>
+</section>
+<section id="summarizing-data" class="level2" data-number="6.6">
+<h2 data-number="6.6" class="anchored" data-anchor-id="summarizing-data"><span class="header-section-number">6.6</span> Summarizing Data</h2>
+<p>SQL becomes particularly powerful when summarizing data.</p>
+<p>Common SQL functions include:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>SQL</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>COUNT()</code></td>
+<td>Count observations</td>
+</tr>
+<tr class="even">
+<td><code>SUM()</code></td>
+<td>Calculate a total</td>
+</tr>
+<tr class="odd">
+<td><code>AVG()</code></td>
+<td>Calculate a mean</td>
+</tr>
+<tr class="even">
+<td><code>MIN()</code></td>
+<td>Find the minimum</td>
+</tr>
+<tr class="odd">
+<td><code>MAX()</code></td>
+<td>Find the maximum</td>
+</tr>
+</tbody>
+</table>
+<p>For example:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT AVG(gpa) AS average_gpa
+  FROM students;
+  "
+)</code></pre>
+<p>We could calculate several statistics simultaneously:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    COUNT(*) AS total_students,
+    AVG(gpa) AS average_gpa,
+    MIN(gpa) AS minimum_gpa,
+    MAX(gpa) AS maximum_gpa
+  FROM students;
+  "
+)</code></pre>
+</section>
+<section id="group-by" class="level2" data-number="6.7">
+<h2 data-number="6.7" class="anchored" data-anchor-id="group-by"><span class="header-section-number">6.7</span> GROUP BY</h2>
+<p>One of the most important SQL concepts is&nbsp;<code>GROUP BY</code>.</p>
+<p>Suppose we want the average GPA for each major.</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    major,
+    COUNT(*) AS total_students,
+    AVG(gpa) AS average_gpa
+  FROM students
+  GROUP BY major;
+  "
+)</code></pre>
+<p>Conceptually, this is similar to:</p>
+<pre><code>students |&gt;
+  dplyr::group_by(major) |&gt;
+  dplyr::summarise(
+    total_students = dplyr::n(),
+    average_gpa = mean(gpa)
+  )</code></pre>
+<p>Learning these relationships can make SQL easier for someone who already understands R.</p>
+</section>
+<section id="sql-joins" class="level2" data-number="6.8">
+<h2 data-number="6.8" class="anchored" data-anchor-id="sql-joins"><span class="header-section-number">6.8</span> SQL Joins</h2>
+<p>One of the biggest advantages of relational databases is that information can be stored across multiple related tables.</p>
+<p>For example, imagine we have:</p>
+<pre><code>students
+courses
+enrollment</code></pre>
+<p>Instead of repeating student and course information everywhere, tables can be connected using identifiers.</p>
+<p>For example:</p>
+<pre><code>students
+--------
+student_id
+student_name
+major</code></pre>
+<pre><code>enrollment
+----------
+student_id
+course_id
+grade</code></pre>
+<p>The variable&nbsp;<code>student_id</code>&nbsp;connects the two tables.</p>
+</section>
+<section id="inner-join" class="level2" data-number="6.9">
+<h2 data-number="6.9" class="anchored" data-anchor-id="inner-join"><span class="header-section-number">6.9</span> INNER JOIN</h2>
+<p>An&nbsp;<code>INNER JOIN</code>&nbsp;keeps observations that match in both tables.</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    students.student_id,
+    students.student_name,
+    enrollment.course_id,
+    enrollment.grade
+  FROM students
+  INNER JOIN enrollment
+    ON students.student_id = enrollment.student_id;
+  "
+)</code></pre>
+</section>
+<section id="left-join" class="level2" data-number="6.10">
+<h2 data-number="6.10" class="anchored" data-anchor-id="left-join"><span class="header-section-number">6.10</span> LEFT JOIN</h2>
+<p>A&nbsp;<code>LEFT JOIN</code>&nbsp;keeps all observations from the left table.</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    students.student_id,
+    students.student_name,
+    enrollment.course_id,
+    enrollment.grade
+  FROM students
+  LEFT JOIN enrollment
+    ON students.student_id = enrollment.student_id;
+  "
+)</code></pre>
+<p>This is similar to:</p>
+<pre><code>dplyr::left_join(
+  students,
+  enrollment,
+  by = "student_id"
+)</code></pre>
+</section>
+<section id="sql-and-dplyr-comparison" class="level2" data-number="6.11">
+<h2 data-number="6.11" class="anchored" data-anchor-id="sql-and-dplyr-comparison"><span class="header-section-number">6.11</span> SQL and dplyr Comparison</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>dplyr</th>
+<th>SQL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>select()</code></td>
+<td><code>SELECT</code></td>
+</tr>
+<tr class="even">
+<td><code>filter()</code></td>
+<td><code>WHERE</code></td>
+</tr>
+<tr class="odd">
+<td><code>arrange()</code></td>
+<td><code>ORDER BY</code></td>
+</tr>
+<tr class="even">
+<td><code>group_by()</code></td>
+<td><code>GROUP BY</code></td>
+</tr>
+<tr class="odd">
+<td><code>summarise()</code></td>
+<td>aggregate functions</td>
+</tr>
+<tr class="even">
+<td><code>mutate()</code></td>
+<td>expressions in&nbsp;<code>SELECT</code></td>
+</tr>
+<tr class="odd">
+<td><code>left_join()</code></td>
+<td><code>LEFT JOIN</code></td>
+</tr>
+<tr class="even">
+<td><code>inner_join()</code></td>
+<td><code>INNER JOIN</code></td>
+</tr>
+<tr class="odd">
+<td><code>distinct()</code></td>
+<td><code>DISTINCT</code></td>
+</tr>
+</tbody>
+</table>
+<p>If you already understand&nbsp;<code>dplyr</code>, many SQL concepts should feel familiar.</p>
+<p>The major difference is the syntax.</p>
+</section>
+</section>
+<section id="saving-sql-results-in-r" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Saving SQL Results in R</h1>
+<p>The results of a SQL query can be saved as an R object.</p>
+<pre><code>psych_students &lt;- DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  WHERE major = 'Psychology';
+  "
+)</code></pre>
+<p>Now:</p>
+<pre><code>psych_students</code></pre>
+<p>is a normal R data frame.</p>
+<p>We can continue using R:</p>
+<pre><code>library(ggplot2)
+
+ggplot(
+  psych_students,
+  aes(x = gpa)
+) +
+  geom_histogram()</code></pre>
+<p>This illustrates an important workflow:</p>
+<pre><code>SQL Database
+      ↓
+SQL Query
+      ↓
+R Data Frame
+      ↓
+Analysis / Visualization / Modeling</code></pre>
+<p>SQL does not replace R.</p>
+<p>Instead, SQL can handle the&nbsp;<strong>storage, organization, filtering, joining, and retrieval of data</strong>, while R can handle subsequent analysis.</p>
+</section>
+<section id="creating-a-sql-database-from-excel-files" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Creating a SQL Database from Excel Files</h1>
+<section id="checking-our-new-database" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="checking-our-new-database"><span class="header-section-number">8.1</span> Checking Our New Database</h2>
+<p>After creating the database, we should verify that everything worked.</p>
+<pre><code>DBI::dbListTables(con)</code></pre>
+<p>We can check the fields:</p>
+<pre><code>DBI::dbListFields(
+  con,
+  "students"
+)</code></pre>
+<p>We can check the number of observations:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT COUNT(*) AS total_rows
+  FROM students;
+  "
+)</code></pre>
+<p>And preview the data:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM students
+  LIMIT 10;
+  "
+)</code></pre>
+<p>This verification step is important whenever databases are created programmatically.</p>
+</section>
+<section id="creating-new-tables-using-sql" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="creating-new-tables-using-sql"><span class="header-section-number">8.2</span> Creating New Tables Using SQL</h2>
+<p>We can also use SQL itself to create tables.</p>
+<p>Suppose we want a table containing only high-performing students.</p>
+<pre><code>DBI::dbExecute(
+  con,
+  "
+  CREATE TABLE high_gpa_students AS
+  SELECT *
+  FROM students
+  WHERE gpa &gt;= 3.5;
+  "
+)</code></pre>
+<p>Now:</p>
+<pre><code>DBI::dbListTables(con)</code></pre>
+<p>will include:</p>
+<pre><code>high_gpa_students</code></pre>
+<p>This introduces an important distinction.</p>
+<ul>
+<li><code>dbGetQuery()</code>&nbsp;is typically used when we want SQL to&nbsp;<strong>return data to R</strong>.</li>
+<li><code>dbExecute()</code>&nbsp;is typically used when we want SQL to&nbsp;<strong>change something in the database</strong>.</li>
+</ul>
+<p>For example:</p>
+<pre><code>CREATE TABLE</code></pre>
+<pre><code>DROP TABLE</code></pre>
+<pre><code>INSERT INTO</code></pre>
+<pre><code>UPDATE</code></pre>
+<pre><code>DELETE</code></pre>
+<p>are operations that modify the database.</p>
+</section>
+<section id="views" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="views"><span class="header-section-number">8.3</span> Views</h2>
+<p>Sometimes we want a reusable query without creating another physical copy of the data.</p>
+<p>SQL provides&nbsp;<strong>views</strong>&nbsp;for this purpose.</p>
+<pre><code>DBI::dbExecute(
+  con,
+  "
+  CREATE VIEW psychology_students AS
+  SELECT *
+  FROM students
+  WHERE major = 'Psychology';
+  "
+)</code></pre>
+<p>We can then query the view:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT *
+  FROM psychology_students;
+  "
+)</code></pre>
+<p>Views can be extremely useful when a complicated query needs to be reused.</p>
+</section>
+<section id="using-sql-to-join-multiple-excel-files" class="level2" data-number="8.4">
+<h2 data-number="8.4" class="anchored" data-anchor-id="using-sql-to-join-multiple-excel-files"><span class="header-section-number">8.4</span> Using SQL to Join Multiple Excel Files</h2>
+<p>Suppose our original data came from:</p>
+<pre><code>students.xlsx
+courses.xlsx
+enrollment.xlsx</code></pre>
+<p>After placing them into our database, we no longer need to manually merge the Excel files.</p>
+<p>Instead, SQL can connect them.</p>
+<pre><code>student_courses &lt;- DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    s.student_id,
+    s.student_name,
+    s.major,
+    c.course_name,
+    e.grade
+  FROM enrollment AS e
+  LEFT JOIN students AS s
+    ON e.student_id = s.student_id
+  LEFT JOIN courses AS c
+    ON e.course_id = c.course_id;
+  "
+)</code></pre>
+<p>Notice the use of aliases:</p>
+<ul>
+<li>students AS s</li>
+<li>courses AS c</li>
+<li>enrollment AS e</li>
+</ul>
+<p>Instead of repeatedly writing:</p>
+<ul>
+<li>students.student_name</li>
+</ul>
+<p>we can write:</p>
+<ul>
+<li>s.student_name</li>
+</ul>
+<p>Aliases become especially helpful when working with large relational databases.</p>
+</section>
+<section id="primary-and-foreign-keys" class="level2" data-number="8.5">
+<h2 data-number="8.5" class="anchored" data-anchor-id="primary-and-foreign-keys"><span class="header-section-number">8.5</span> Primary and Foreign Keys</h2>
+<p>Relational databases work best when tables have clearly defined relationships.</p>
+<p>Consider:</p>
+<pre><code>students
+--------
+student_id
+student_name
+major</code></pre>
+<p>and:</p>
+<pre><code>enrollment
+----------
+student_id
+course_id
+grade</code></pre>
+<p><code>student_id</code>&nbsp;uniquely identifies students in the&nbsp;<code>students</code>&nbsp;table.</p>
+<p>This is conceptually the&nbsp;<strong>primary key</strong>.</p>
+<p>The&nbsp;<code>student_id</code>&nbsp;appearing in&nbsp;<code>enrollment</code>&nbsp;connects enrollment records back to students.</p>
+<p>This acts as a&nbsp;<strong>foreign key</strong>.</p>
+<p>Understanding these relationships is essential when designing databases.</p>
+<p>A useful question to ask when creating each table is:</p>
+<blockquote class="blockquote">
+<p>What uniquely identifies one row?</p>
+</blockquote>
+<ul>
+<li><p>For students:&nbsp;<code>student_id</code></p></li>
+<li><p>For courses:&nbsp;<code>course_id</code></p></li>
+<li><p>For games:&nbsp;<code>game_id</code></p></li>
+<li><p>For players:&nbsp;<code>player_id</code></p></li>
+</ul>
+<p>Well-designed identifiers make SQL joins considerably easier and safer.</p>
+</section>
+</section>
+<section id="a-more-realistic-database-workflow" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> A More Realistic Database Workflow</h1>
+<p>In a real project, we might receive several raw files:</p>
+<pre><code>data/
+├── students.xlsx
+├── courses.xlsx
+├── enrollment.xlsx
+└── instructors.xlsx</code></pre>
+<p>We import them into R:</p>
+<pre><code>Excel
+  ↓
+R</code></pre>
+<p>Then create a relational database:</p>
+<pre><code>R
+  ↓
+SQLite</code></pre>
+<p>The resulting database might look like:</p>
+<pre><code>project_database.db
+
+students
+   │
+   └── student_id
+          │
+          ▼
+      enrollment
+          ▲
+          │
+       course_id
+          │
+       courses</code></pre>
+<p>We can then use SQL for:</p>
+<pre><code>SELECT
+WHERE
+ORDER BY
+GROUP BY
+JOIN
+CREATE TABLE
+CREATE VIEW</code></pre>
+<p>and bring the resulting data into R when needed for:</p>
+<ul>
+<li>ggplot2</li>
+<li>statistical analysis</li>
+<li>modeling</li>
+<li>reporting</li>
+<li>Quarto</li>
+<li>Shiny</li>
+</ul>
+<p>This creates a complete workflow:</p>
+<pre><code>Raw Files
+    ↓
+R Import / Cleaning
+    ↓
+SQLite Database
+    ↓
+SQL Queries
+    ↓
+Analysis in R
+    ↓
+Quarto / Shiny / Reports</code></pre>
+</section>
+<section id="closing-the-database-connection" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Closing the Database Connection</h1>
+<p>When we finish working with a database, we should disconnect from it.</p>
+<pre><code>DBI::dbDisconnect(con)</code></pre>
+<p>For scripts that create database connections, we can also use:</p>
+<pre><code>on.exit(
+  DBI::dbDisconnect(con),
+  add = TRUE
+)</code></pre>
+<p>This helps ensure that the database connection is closed when the script finishes.</p>
+</section>
+<section id="putting-everything-together" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> Putting Everything Together</h1>
+<p>A basic database creation script might therefore look like:</p>
+<pre><code>library(DBI)
+library(RSQLite)
+library(readxl)
+
+# Import data
+
+students &lt;- readxl::read_excel(
+  file.path("data", "students.xlsx")
+)
+
+courses &lt;- readxl::read_excel(
+  file.path("data", "courses.xlsx")
+)
+
+enrollment &lt;- readxl::read_excel(
+  file.path("data", "enrollment.xlsx")
+)
+
+# Connect to database
+
+con &lt;- DBI::dbConnect(
+  RSQLite::SQLite(),
+  file.path("database", "project_database.db")
+)
+
+on.exit(
+  DBI::dbDisconnect(con),
+  add = TRUE
+)
+
+# Write tables
+
+DBI::dbWriteTable(
+  con,
+  "students",
+  students,
+  overwrite = TRUE
+)
+
+DBI::dbWriteTable(
+  con,
+  "courses",
+  courses,
+  overwrite = TRUE
+)
+
+DBI::dbWriteTable(
+  con,
+  "enrollment",
+  enrollment,
+  overwrite = TRUE
+)
+
+# Verify database
+
+DBI::dbListTables(con)
+
+message("SQLite database created.")</code></pre>
+<p>At this point, the Excel files have become tables within a SQL database.</p>
+<p>We can now work with them using SQL:</p>
+<pre><code>DBI::dbGetQuery(
+  con,
+  "
+  SELECT
+    s.student_name,
+    s.major,
+    c.course_name,
+    e.grade
+  FROM enrollment AS e
+  LEFT JOIN students AS s
+    ON e.student_id = s.student_id
+  LEFT JOIN courses AS c
+    ON e.course_id = c.course_id
+  ORDER BY s.student_name;
+  "
+)</code></pre>
+</section>
+<section id="sql-skills-to-practice" class="level1" data-number="12">
+<h1 data-number="12"><span class="header-section-number">12</span> SQL Skills to Practice</h1>
+<p>Once you are comfortable creating and connecting to databases, practice these SQL concepts in roughly this order:</p>
+<ol type="1">
+<li><code>SELECT</code></li>
+<li><code>FROM</code></li>
+<li><code>WHERE</code></li>
+<li><code>ORDER BY</code></li>
+<li><code>LIMIT</code></li>
+<li><code>DISTINCT</code></li>
+<li><code>COUNT()</code>,&nbsp;<code>AVG()</code>,&nbsp;<code>SUM()</code>,&nbsp;<code>MIN()</code>,&nbsp;<code>MAX()</code></li>
+<li><code>GROUP BY</code></li>
+<li><code>HAVING</code></li>
+<li><code>CASE WHEN</code></li>
+<li><code>INNER JOIN</code></li>
+<li><code>LEFT JOIN</code></li>
+<li>Multiple joins</li>
+<li>Subqueries</li>
+<li>Common Table Expressions (<code>WITH</code>)</li>
+<li>Window functions</li>
+<li><code>CREATE TABLE</code></li>
+<li><code>CREATE VIEW</code></li>
+<li><code>INSERT</code></li>
+<li><code>UPDATE</code>&nbsp;and&nbsp;<code>DELETE</code></li>
+</ol>
+<p>These concepts represent a strong foundation for using SQL in real analytical work.</p>
+</section>
+<section id="conclusion" class="level1" data-number="13">
+<h1 data-number="13"><span class="header-section-number">13</span> Conclusion</h1>
+<p>Learning SQL does not require abandoning R.</p>
+<p>Instead, R can serve as the environment where we connect to databases, send SQL queries, retrieve results, and continue our analysis.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>For someone already familiar with R, a useful way to think about the relationship is:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>R = analysis environment</li>
+<li>SQL = language for working with relational data</li>
+<li>SQLite = database storing the data</li>
+<li>DBI = bridge connecting R and the database</li>
+</ul>
+</div>
+</div>
+<p>Together, these tools allow us to move from individual files toward more structured and scalable data workflows.</p>
+<p>Perhaps most importantly, the SQL written through&nbsp;<code>DBI::dbGetQuery()</code>&nbsp;is&nbsp;<strong>real SQL</strong>. The same fundamental concepts—<code>SELECT</code>,&nbsp;<code>WHERE</code>,&nbsp;<code>GROUP BY</code>,&nbsp;<code>JOIN</code>, subqueries, CTEs, and window functions—carry into database systems such as PostgreSQL, MySQL, SQL Server, and others.</p>
+<p>The database system may eventually change.</p>
+<p><em>The SQL skills remain.</em></p>
+</section>
+<section id="key-takeaways" class="level1" data-number="14">
+<h1 data-number="14"><span class="header-section-number">14</span> Key Takeaways</h1>
+<ul>
+<li>A <em>database</em>- an organized collection of data that can contain multiple related tables.</li>
+<li><em>SQL (Structured Query Language)</em>- the language used to communicate with and work with databases.</li>
+<li><em>SQLite</em>- allows an entire database to be stored as a single <code>.db</code> file, making it a useful database system for working with SQL in R.</li>
+<li>The <code>DBI</code> package provides the connection between R and a database, while <code>RSQLite</code> allows R to work specifically with SQLite databases.</li>
+<li>Use <code>DBI::dbConnect()</code> to connect to an existing SQLite database or create a new one.</li>
+<li>Use <code>DBI::dbListTables()</code> and <code>DBI::dbListFields()</code> to explore the tables and columns available within a database.</li>
+<li>Use <code>DBI::dbReadTable()</code> to load an entire database table into R as a data frame.</li>
+<li>Use <code>DBI::dbGetQuery()</code> to send SQL queries to a database and return the results to R.</li>
+<li>SQL commands such as <code>SELECT</code>, <code>WHERE</code>, <code>ORDER BY</code>, <code>LIMIT</code>, and <code>GROUP BY</code> allow us to retrieve, filter, sort, limit, and summarize data.</li>
+<li>SQL aggregate functions such as <code>COUNT()</code>, <code>SUM()</code>, <code>AVG()</code>, <code>MIN()</code>, and <code>MAX()</code> allow us to summarize information directly within the database.</li>
+<li><code>INNER JOIN</code> and <code>LEFT JOIN</code> allow information from multiple related tables to be combined using shared identifiers.</li>
+<li><em>Primary keys</em>- uniquely identify observations within a table, while <em>foreign keys</em>- allow tables to be related to one another.</li>
+<li>Existing Excel files can be imported into R using <code>read_excel()</code> and added as tables within a SQLite database using <code>DBI::dbWriteTable()</code>.</li>
+<li>Use <code>DBI::dbExecute()</code> when SQL should modify the database rather than simply return results.</li>
+<li>SQL can be used to create new tables and views directly within a database.</li>
+<li>Use <code>DBI::dbDisconnect()</code> when you are finished working with a database.</li>
+<li>SQL does not replace R. SQL can handle data storage, retrieval, filtering, summarizing, and joining, while the resulting data can still be analyzed, visualized, and reported using R.</li>
+</ul>
+</section>
+<section id="checklist" class="level1" data-number="15">
+<h1 data-number="15"><span class="header-section-number">15</span> Checklist</h1>
+<section id="connecting-to-and-exploring-a-database" class="level2" data-number="15.1">
+<h2 data-number="15.1" class="anchored" data-anchor-id="connecting-to-and-exploring-a-database"><span class="header-section-number">15.1</span> Connecting to and Exploring a Database</h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Installed and loaded <code>DBI</code> and <code>RSQLite</code></label></li>
+<li><label><input type="checkbox">Created or identified the SQLite <code>.db</code> file</label></li>
+<li><label><input type="checkbox">Connected to the database using <code>DBI::dbConnect()</code></label></li>
+<li><label><input type="checkbox">Stored the connection as an object such as <code>con</code></label></li>
+<li><label><input type="checkbox">Checked the available tables using <code>DBI::dbListTables()</code></label></li>
+<li><label><input type="checkbox">Examined table columns using <code>DBI::dbListFields()</code></label></li>
+<li><label><input type="checkbox">Previewed tables before beginning an analysis</label></li>
+<li><label><input type="checkbox">Used <code>DBI::dbReadTable()</code> when an entire table needed to be loaded into R</label></li>
+</ul>
+</section>
+<section id="working-with-sql" class="level2" data-number="15.2">
+<h2 data-number="15.2" class="anchored" data-anchor-id="working-with-sql"><span class="header-section-number">15.2</span> Working with SQL</h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Used <code>SELECT</code> to choose the columns to retrieve</label></li>
+<li><label><input type="checkbox">Used <code>FROM</code> to identify the table being queried</label></li>
+<li><label><input type="checkbox">Used <code>WHERE</code> to filter observations</label></li>
+<li><label><input type="checkbox">Combined multiple conditions using <code>AND</code> or <code>OR</code></label></li>
+<li><label><input type="checkbox">Used <code>ORDER BY</code> to sort query results</label></li>
+<li><label><input type="checkbox">Used <code>LIMIT</code> when only a small number of rows were needed</label></li>
+<li><label><input type="checkbox">Used <code>COUNT()</code>, <code>SUM()</code>, <code>AVG()</code>, <code>MIN()</code>, or <code>MAX()</code> to summarize data</label></li>
+<li><label><input type="checkbox">Used <code>GROUP BY</code> when summaries were needed for different groups</label></li>
+<li><label><input type="checkbox">Used <code>AS</code> to create clear aliases for columns, calculations, or tables</label></li>
+<li><label><input type="checkbox">Used <code>INNER JOIN</code> or <code>LEFT JOIN</code> to combine related tables</label></li>
+<li><label><input type="checkbox">Checked that tables were joined using the correct identifying variables</label></li>
+<li><label><input type="checkbox">Saved SQL query results as R objects when additional analysis was needed</label></li>
+</ul>
+</section>
+<section id="creating-and-managing-a-database" class="level2" data-number="15.3">
+<h2 data-number="15.3" class="anchored" data-anchor-id="creating-and-managing-a-database"><span class="header-section-number">15.3</span> Creating and Managing a Database</h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Organized raw files, databases, scripts, and reports within the R Project</label></li>
+<li><label><input type="checkbox">Imported Excel files into R using <code>read_excel()</code></label></li>
+<li><label><input type="checkbox">Determined which datasets should become separate database tables</label></li>
+<li><label><input type="checkbox">Identified variables that uniquely identify observations within each table</label></li>
+<li><label><input type="checkbox">Identified relationships between tables using shared identifiers</label></li>
+<li><label><input type="checkbox">Created or connected to the SQLite database</label></li>
+<li><label><input type="checkbox">Added R data frames to the database using <code>DBI::dbWriteTable()</code></label></li>
+<li><label><input type="checkbox">Verified newly created tables using <code>DBI::dbListTables()</code></label></li>
+<li><label><input type="checkbox">Checked the fields and number of observations in newly created tables</label></li>
+<li><label><input type="checkbox">Used <code>DBI::dbExecute()</code> when creating or modifying database objects</label></li>
+<li><label><input type="checkbox">Created a table or view using SQL when appropriate</label></li>
+<li><label><input type="checkbox">Disconnected from the database using <code>DBI::dbDisconnect()</code> when finished</label></li>
+</ul>
+</section>
+</section>
+<section id="key-functions-commands" class="level1" data-number="16">
+<h1 data-number="16"><span class="header-section-number">16</span> Key Functions &amp; Commands</h1>
+<p>The following R functions and SQL commands are introduced or reinforced in this guide to support database creation, exploration, querying, and management.</p>
+<section id="r-functions" class="level2" data-number="16.1">
+<h2 data-number="16.1" class="anchored" data-anchor-id="r-functions"><span class="header-section-number">16.1</span> R Functions</h2>
+<ul>
+<li><code>DBI::dbConnect()</code>: Creates a connection between R and a database.</li>
+<li><code>RSQLite::SQLite()</code>: Specifies SQLite as the database system when establishing a connection.</li>
+<li><code>DBI::dbListTables()</code>: Lists the tables available within a connected database.</li>
+<li><code>DBI::dbListFields()</code>: Lists the fields, or columns, contained within a database table.</li>
+<li><code>DBI::dbReadTable()</code>: Reads an entire database table into R as a data frame.</li>
+<li><code>DBI::dbGetQuery()</code>: Sends a SQL query to the database and returns the resulting data to R.</li>
+<li><code>DBI::dbWriteTable()</code>: Writes an R data frame to the database as a table.</li>
+<li><code>DBI::dbExecute()</code>: Executes SQL statements that modify the database rather than returning a dataset.</li>
+<li><code>DBI::dbDisconnect()</code>: Closes the connection between R and the database.</li>
+<li><code>readxl::read_excel()</code>: Imports an Excel file into R before it is added to the database.</li>
+<li><code>file.path()</code>: Creates file paths in a way that works across operating systems and is useful for organizing database projects.</li>
+</ul>
+</section>
+<section id="sql-commands" class="level2" data-number="16.2">
+<h2 data-number="16.2" class="anchored" data-anchor-id="sql-commands"><span class="header-section-number">16.2</span> SQL Commands</h2>
+<ul>
+<li><code>SELECT</code>: Specifies the columns or information that should be returned by a query.</li>
+<li><code>FROM</code>: Identifies the table from which data should be retrieved.</li>
+<li><code>WHERE</code>: Filters rows based on one or more conditions.</li>
+<li><code>AND</code> / <code>OR</code>: Combines multiple filtering conditions.</li>
+<li><code>ORDER BY</code>: Sorts query results according to one or more columns.</li>
+<li><code>ASC</code> / <code>DESC</code>: Specifies whether results should be sorted in ascending or descending order.</li>
+<li><code>LIMIT</code>: Restricts the number of rows returned by a query.</li>
+<li><code>AS</code>: Creates an alias for a column, calculation, or table.</li>
+<li><code>COUNT()</code>: Counts observations.</li>
+<li><code>SUM()</code>: Calculates the total of a numeric column.</li>
+<li><code>AVG()</code>: Calculates the average of a numeric column.</li>
+<li><code>MIN()</code>: Returns the minimum value of a column.</li>
+<li><code>MAX()</code>: Returns the maximum value of a column.</li>
+<li><code>GROUP BY</code>: Groups observations so that summary calculations can be performed separately for each group.</li>
+<li><code>INNER JOIN</code>: Combines tables while keeping only observations that match in both tables.</li>
+<li><code>LEFT JOIN</code>: Combines tables while keeping all observations from the left table and matching information from the right table when available.</li>
+<li><code>ON</code>: Specifies the variables used to connect tables during a SQL join.</li>
+<li><code>CREATE TABLE</code>: Creates a new table within the database.</li>
+<li><code>CREATE VIEW</code>: Creates a reusable SQL query that can be queried similarly to a table without creating another physical copy of the data.</li>
+<li><code>CAST()</code>: Converts a value from one data type to another.</li>
+<li><code>DROP TABLE</code>: Removes a table from the database.</li>
+<li><code>INSERT INTO</code>: Adds new records to an existing database table.</li>
+<li><code>UPDATE</code>: Modifies existing records within a table.</li>
+<li><code>DELETE</code>: Removes records from a table.</li>
+</ul>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -30,13 +30,16 @@ Since then, **nycOpenData** has undergone peer review and been accepted into t
 
 The OpenData ecosystem continues to grow. Currently, the following packages are available on CRAN:
 
-| Package                      | Coverage                              |
-|------------------------------|---------------------------------------|
-| `nycOpenData` @R-nycOpenData | New York City                         |
-| `nysOpenData` @R-nysOpenData | New York State                        |
+| Package | Coverage |
+|----|----|
+| `nycOpenData` @R-nycOpenData | New York City |
+| `nysOpenData` @R-nysOpenData | New York State |
 | `mtaOpenData` @R-mtaOpenData | Metropolitan Transportation Authority |
-| `laOpenData` @R-laOpenData   | Los Angeles                           |
-| `chiOpenData` @R-chiOpenData | Chicago                               |
+| `laOpenData` @R-laOpenData | Los Angeles |
+| `chiOpenData` @R-chiOpenData | Chicago |
+| `ausOpenData` @R-ausOpenData | Austin |
+| `SeattleOpenData` @R-SeattleOpenData | Seattle |
+| `cincinnatiOpenData` @R-cincinnatiOpenData | Cincinnati |
 
 Together, these packages provide convenient access to tens of billions of rows of publicly available data spanning transportation, public safety, health, education, housing, the environment, and many other domains.
 
@@ -51,11 +54,8 @@ This guide is intended for anyone interested in creating a new OpenData package 
 While some familiarity with R package development is helpful, this guide does **not** attempt to teach:
 
 - R programming
-
 - API development
-
 - SoQL
-
 - General R package development
 
 Instead, it focuses specifically on adapting the existing OpenData framework to a new city, allowing contributors to build consistent, maintainable packages without starting from scratch.
@@ -63,13 +63,9 @@ Instead, it focuses specifically on adapting the existing OpenData framework to 
 This guide is especially useful for:
 
 - R package developers
-
 - Students contributing to the OpenData ecosystem
-
 - Civic technologists
-
 - Researchers working with municipal data
-
 - Contributors interested in expanding the OpenData package collection
 
 ## How to Use This Guide
@@ -79,13 +75,9 @@ The chapters in this guide are designed to be completed sequentially.
 For each script you will:
 
 1.  Understand its role within the package.
-
 2.  Learn what needs to be customized.
-
 3.  Verify that your changes work correctly.
-
 4.  Review common pitfalls.
-
 5.  Complete a checklist before moving to the next chapter.
 
 Following this workflow ensures that every package built from the template follows the same architecture, quality standards, and user experience—making the OpenData ecosystem easier to maintain, expand, and use.

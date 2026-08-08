@@ -1,0 +1,939 @@
+---
+title: "Text Analysis Internship"
+subtitle: "SQL + R Working Guide"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    code-tools: true
+    embed-resources: true
+---
+
+# Project Overview
+
+The goal of this project is to build a reproducible workflow for collecting, storing, processing, and analyzing text data from online articles.
+
+The project will use three primary tools:
+
+* **R** for importing data, extracting article text, transforming text, and conducting analyses.
+* **SQL** for storing, organizing, querying, updating, and connecting data.
+* **Quarto** for documenting the workflow and producing the final analysis.
+
+The general workflow is:
+
+```{mermaid}
+flowchart TD
+    A[Excel Article Catalog] --> B[R: Import and Clean]
+    B --> C[SQL: Create Database]
+    C --> D[SQL: Store Article Metadata]
+    D --> E[SQL: Query Articles]
+    E --> F[R: Extract Article Text]
+    F --> G[SQL: Update Article Records]
+    G --> H[R: Clean and Tokenize Text]
+    H --> I[SQL: Store Tokens]
+    I --> J[SQL: Explore and Summarize]
+    J --> K[R: Text Analysis]
+    K --> L[SQL: Store Results]
+    L --> M[Quarto: Final Analysis]
+```
+
+The database should become the central source of data for the project. R will communicate with the database whenever information needs to be retrieved, transformed, analyzed, or stored.
+
+---
+
+# 1. Prepare the Article Dataset
+
+## Goal
+
+Import the existing Excel article catalog into R and prepare it for insertion into the project database.
+
+The Excel file should remain unchanged so that the original source data is always preserved.
+
+## Starting Point
+
+The current Excel file contains one row per article and four columns containing information about each article.
+
+Before continuing, answer:
+
+> **What uniquely identifies one article?**
+
+The project will eventually use:
+
+```text
+article_id
+```
+
+as the unique identifier for each article.
+
+## Tasks
+
+* [ ] Load the required R packages.
+* [ ] Import the Excel file into R.
+* [ ] Inspect the structure of the dataset.
+* [ ] Confirm that one row represents one article.
+* [ ] Clean the column names if necessary.
+* [ ] Check for missing URLs.
+* [ ] Check for duplicate articles.
+* [ ] Create a unique `article_id`.
+* [ ] Confirm that the dataset is ready for the database.
+
+## R Code
+
+```{r}
+# Add code here
+```
+
+## Questions / Decisions
+
+**How many articles are in the original dataset?**
+
+> Add notes here.
+
+**Are any URLs missing?**
+
+> Add notes here.
+
+**Are there duplicate articles or URLs?**
+
+> Add notes here.
+
+**Were any changes made to the original columns?**
+
+> Add notes here.
+
+## Checkpoint
+
+At this stage, you should have:
+
+* the original Excel file preserved;
+* an R object containing the article catalog;
+* one row representing one article;
+* a unique `article_id`;
+* valid URLs for the articles; and
+* a dataset ready to enter the SQL database.
+
+---
+
+# 2. Design the Database
+
+## Goal
+
+Create a SQLite database that will become the central storage location for the text-analysis project.
+
+Rather than allowing R to automatically determine the database structure, think explicitly about how the data should be stored.
+
+## Database
+
+Proposed database name:
+
+```text
+text_analysis.db
+```
+
+## Initial Table
+
+The first table will contain information about the articles.
+
+```text
+articles
+```
+
+One row should represent:
+
+> **One article**
+
+A possible structure is:
+
+| Column         | Type    | Description                       |
+| -------------- | ------- | --------------------------------- |
+| `article_id`   | INTEGER | Unique identifier for the article |
+| `url`          | TEXT    | URL of the article                |
+| `title`        | TEXT    | Article title                     |
+| `publication`  | TEXT    | Publication or source             |
+| `article_date` | DATE    | Publication date                  |
+| `article_text` | TEXT    | Extracted article text            |
+
+Modify this structure if the source dataset requires different fields.
+
+## Tasks
+
+* [ ] Determine the database location.
+* [ ] Connect R to SQLite.
+* [ ] Design the `articles` table.
+* [ ] Select appropriate SQL data types.
+* [ ] Identify the primary key.
+* [ ] Create the table.
+* [ ] Confirm that the table exists.
+
+## SQL
+
+```{text}
+-- Write the CREATE TABLE statement here.
+```
+
+## Database Design Notes
+
+**Why is `article_id` the primary key?**
+
+> Add notes here.
+
+**Why were these data types selected?**
+
+> Add notes here.
+
+**Were any columns added or removed from the proposed schema? Why?**
+
+> Add notes here.
+
+## Checkpoint
+
+At this stage, you should have:
+
+* a SQLite database;
+* an `articles` table;
+* clearly defined columns;
+* appropriate SQL data types; and
+* a primary key.
+
+---
+
+# 3. Populate the Article Database
+
+## Goal
+
+Transfer the article metadata from R into the SQL database.
+
+At this point, the database should begin replacing the Excel file as the primary working source for the project.
+
+The Excel file remains the **original source**, while the SQLite database becomes the **working data source**.
+
+## Tasks
+
+* [ ] Connect to the database.
+* [ ] Insert the article records.
+* [ ] Confirm that the records were successfully inserted.
+* [ ] Compare the number of database rows with the original dataset.
+* [ ] Inspect several records manually.
+
+## R / SQL Code
+
+```{r}
+# Add code for inserting the records here.
+```
+
+## Verification
+
+Write a SQL query that counts the number of articles in the database.
+
+```{text}
+-- Add query here.
+```
+
+Write a SQL query that displays several records.
+
+```{text}
+-- Add query here.
+```
+
+## Questions
+
+**How many rows are in the SQL table?**
+
+> Add notes here.
+
+**Does this match the original Excel dataset?**
+
+> Add notes here.
+
+**Did any problems occur while inserting the records?**
+
+> Add notes here.
+
+## Checkpoint
+
+At this stage, you should have:
+
+* one database record per article;
+* article metadata stored in SQL;
+* matching record counts between the original dataset and database; and
+* an empty or missing `article_text` value for articles that have not yet been processed.
+
+---
+
+# 4. Query Articles for Processing
+
+## Goal
+
+Use SQL to identify which articles still require text extraction.
+
+Rather than loading the entire database into R every time, query only the records required for the next task.
+
+This introduces an important workflow:
+
+> **Query → Transform → Update**
+
+## Tasks
+
+* [ ] Identify articles where text has not been collected.
+* [ ] Return the `article_id` and URL.
+* [ ] Load those records into R.
+* [ ] Confirm the number of articles requiring processing.
+
+## SQL
+
+Write a query that returns articles where `article_text` is missing.
+
+```{text}
+-- Add query here.
+```
+
+Think about which SQL clause can be used to filter records.
+
+## R Code
+
+Use R to send the query to the database and store the results.
+
+```{r}
+# Add code here.
+```
+
+## Questions
+
+**How many articles require text extraction?**
+
+> Add notes here.
+
+**Why is querying only these records preferable to loading the entire table?**
+
+> Add notes here.
+
+## Checkpoint
+
+You should now have an R object containing only the articles that require text extraction.
+
+---
+
+# 5. Extract Article Text
+
+## Goal
+
+Use the article URLs stored in the database to extract the text from each article.
+
+This step belongs primarily in **R**, because R provides tools for requesting webpages, parsing HTML, manipulating text, and handling errors.
+
+The goal is to produce a dataset containing at minimum:
+
+| article_id | article_text                   |
+| ---------- | ------------------------------ |
+| 1          | Full extracted article text... |
+| 2          | Full extracted article text... |
+
+## Tasks
+
+* [ ] Test text extraction on one article.
+* [ ] Inspect the extracted text.
+* [ ] Remove unnecessary webpage content if needed.
+* [ ] Create a reusable extraction function.
+* [ ] Apply the function across the article URLs.
+* [ ] Preserve `article_id`.
+* [ ] Identify articles where extraction fails.
+* [ ] Store the resulting text in an R object.
+
+## Test Article
+
+Start with **one article** before attempting to process the entire dataset.
+
+```{r}
+# Test extraction code here.
+```
+
+## Extraction Function
+
+Once the process works for one article, create a reusable function.
+
+```{r}
+# Create article extraction function here.
+```
+
+## Process Articles
+
+```{r}
+# Apply function to articles requiring processing.
+```
+
+## Quality Checks
+
+**Did every URL successfully return article text?**
+
+> Add notes here.
+
+**Were navigation menus, advertisements, captions, or other webpage elements included?**
+
+> Add notes here.
+
+**Were any websites difficult or impossible to extract?**
+
+> Add notes here.
+
+**How were failed requests handled?**
+
+> Add notes here.
+
+## Checkpoint
+
+At this stage, you should have:
+
+* an `article_id` for every processed record;
+* extracted article text;
+* a record of extraction failures; and
+* an R object ready to update the database.
+
+---
+
+# 6. Update the SQL Database
+
+## Goal
+
+Write the extracted article text back into the existing `articles` table.
+
+The goal is **not** to recreate the entire table.
+
+Instead, update the appropriate record using its `article_id`.
+
+This introduces another important SQL operation:
+
+```text
+UPDATE
+```
+
+## Tasks
+
+* [ ] Match extracted text to `article_id`.
+* [ ] Update the appropriate database records.
+* [ ] Verify that article text was stored correctly.
+* [ ] Confirm that existing metadata was not changed.
+* [ ] Identify any records that still have missing text.
+
+## SQL
+
+Develop the appropriate update operation.
+
+```{text}
+-- Add UPDATE logic here.
+```
+
+## Verification
+
+Write a query to identify articles that still have missing text.
+
+```{text}
+-- Add verification query here.
+```
+
+Write another query that counts successfully processed articles.
+
+```{text}
+-- Add query here.
+```
+
+## Questions
+
+**How many articles were successfully updated?**
+
+> Add notes here.
+
+**How many articles still have missing text?**
+
+> Add notes here.
+
+**Why is `article_id` important when updating the table?**
+
+> Add notes here.
+
+## Checkpoint
+
+The `articles` table should now contain both:
+
+* the original article metadata; and
+* the extracted article text.
+
+The database is now ready to support text analysis.
+
+---
+
+# 7. Prepare Text for Analysis
+
+## Goal
+
+Transform the raw article text into an analysis-ready format.
+
+Raw article text is useful for preservation, but many text-analysis methods work better when text is converted into individual words or **tokens**.
+
+The raw article text should remain in the `articles` table.
+
+Create transformed data separately rather than replacing the original text.
+
+## Proposed Table
+
+```text
+article_tokens
+```
+
+One row represents:
+
+> **One token from one article**
+
+A possible structure is:
+
+| Column        | Type    | Description                              |
+| ------------- | ------- | ---------------------------------------- |
+| `article_id`  | INTEGER | Article containing the word              |
+| `word`        | TEXT    | Individual token                         |
+| `word_number` | INTEGER | Position of the token within the article |
+
+For example:
+
+| article_id | word    | word_number |
+| ---------: | ------- | ----------: |
+|          1 | city    |           1 |
+|          1 | housing |           2 |
+|          1 | policy  |           3 |
+|          2 | mayor   |           1 |
+
+## Tasks
+
+* [ ] Retrieve article text from SQL.
+* [ ] Tokenize the text in R.
+* [ ] Standardize text where appropriate.
+* [ ] Decide how punctuation should be handled.
+* [ ] Decide how stop words should be handled.
+* [ ] Preserve `article_id`.
+* [ ] Create the `article_tokens` table.
+* [ ] Store the tokenized data in SQL.
+
+## R Code
+
+```{r}
+# Tokenization code here.
+```
+
+## SQL
+
+```{text}
+-- Create article_tokens table here.
+```
+
+## Decisions
+
+**Should stop words be stored in the database or removed first? Why?**
+
+> Add notes here.
+
+**Should punctuation be preserved?**
+
+> Add notes here.
+
+**Should words be converted to lowercase?**
+
+> Add notes here.
+
+## Checkpoint
+
+At this stage, the database should contain:
+
+```text
+articles
+1 row = 1 article
+
+article_tokens
+1 row = 1 token
+```
+
+---
+
+# 8. Explore Text Using SQL
+
+## Goal
+
+Use SQL itself to answer basic text-analysis questions before moving into more advanced analysis in R.
+
+This is an opportunity to practice:
+
+* `SELECT`
+* `WHERE`
+* `COUNT()`
+* `GROUP BY`
+* `ORDER BY`
+* `JOIN`
+* aliases
+* aggregate functions
+
+## Question 1: How many words are stored?
+
+```{text}
+-- Write query here.
+```
+
+## Question 2: What are the most common words?
+
+```{text}
+-- Write query here.
+```
+
+## Question 3: How many words are in each article?
+
+```{text}
+-- Write query here.
+```
+
+## Question 4: Which articles contain a particular word?
+
+```{text}
+-- Write query here.
+```
+
+## Question 5: Combine Tokens with Article Metadata
+
+Use a `JOIN` to connect `article_tokens` with `articles`.
+
+```{text}
+-- Write JOIN here.
+```
+
+## Additional Questions
+
+Develop at least **three additional questions** that can be answered using SQL.
+
+### Question 1
+
+> Write question here.
+
+```{text}
+-- Query
+```
+
+### Question 2
+
+> Write question here.
+
+```{text}
+-- Query
+```
+
+### Question 3
+
+> Write question here.
+
+```{text}
+-- Query
+```
+
+## What Did We Learn?
+
+> Summarize the most interesting findings here.
+
+---
+
+# 9. Conduct the Text Analysis
+
+## Goal
+
+Use R to perform the primary text analysis.
+
+Possible analyses may include:
+
+* word frequencies;
+* stop-word filtering;
+* lexicon analysis;
+* sentiment analysis;
+* bigrams or n-grams;
+* comparisons across publications;
+* comparisons across time;
+* topic analysis; or
+* other computational text-analysis methods.
+
+Not every analysis needs to be conducted. Select methods that address the research question.
+
+## Retrieve Data
+
+Use SQL to retrieve only the information required for the analysis.
+
+```{r}
+# Query database here.
+```
+
+## Analysis
+
+```{r}
+# Text-analysis code here.
+```
+
+## Visualizations
+
+```{r}
+# Visualization code here.
+```
+
+## Findings
+
+> Record preliminary findings here.
+
+---
+
+# 10. Store Analysis Results
+
+## Goal
+
+Consider whether important analysis outputs should be stored back in the database.
+
+For example, a new table could contain article-level sentiment results:
+
+```text
+article_sentiment
+```
+
+One row represents:
+
+> **One article's sentiment results**
+
+Possible structure:
+
+| Column            | Description                |
+| ----------------- | -------------------------- |
+| `article_id`      | Article identifier         |
+| `positive_words`  | Number of positive words   |
+| `negative_words`  | Number of negative words   |
+| `sentiment_score` | Calculated sentiment score |
+
+## Tasks
+
+* [ ] Decide which results should be preserved.
+* [ ] Design the results table.
+* [ ] Create the table using SQL.
+* [ ] Write results to the database.
+* [ ] Verify the results.
+* [ ] Join the results back to article metadata.
+
+## SQL
+
+```{text}
+-- Create results table here.
+```
+
+## Join Practice
+
+Write a query connecting the article metadata with the analysis results.
+
+```{text}
+-- Add JOIN here.
+```
+
+## Checkpoint
+
+The database may now contain:
+
+```text
+articles
+        |
+        | article_id
+        |
+        +-------- article_tokens
+        |
+        +-------- article_sentiment
+```
+
+The exact structure may change depending on the analyses conducted.
+
+---
+
+# 11. Produce the Final Quarto Analysis
+
+## Goal
+
+Create a separate polished Quarto document presenting the actual research analysis.
+
+This working guide documents **how the project was built**.
+
+The final report should communicate **what the analysis found**.
+
+The final report may include:
+
+* research question;
+* data sources;
+* methodology;
+* article corpus description;
+* text-processing methods;
+* descriptive statistics;
+* word-frequency results;
+* sentiment results;
+* visualizations;
+* interpretation;
+* limitations; and
+* conclusions.
+
+The final report should retrieve its analytical data from the SQLite database whenever possible.
+
+---
+
+# Database Structure
+
+As the project develops, update this diagram to reflect the actual database.
+
+```{mermaid}
+erDiagram
+
+    ARTICLES ||--o{ ARTICLE_TOKENS : contains
+    ARTICLES ||--o| ARTICLE_SENTIMENT : has
+
+    ARTICLES {
+        INTEGER article_id PK
+        TEXT url
+        TEXT title
+        TEXT publication
+        DATE article_date
+        TEXT article_text
+    }
+
+    ARTICLE_TOKENS {
+        INTEGER article_id FK
+        TEXT word
+        INTEGER word_number
+    }
+
+    ARTICLE_SENTIMENT {
+        INTEGER article_id FK
+        INTEGER positive_words
+        INTEGER negative_words
+        REAL sentiment_score
+    }
+```
+
+---
+
+# SQL Skills Practiced
+
+Use this section as a running checklist.
+
+## Database Design
+
+* [ ] Database creation
+* [ ] Table creation
+* [ ] SQL data types
+* [ ] Primary keys
+* [ ] Foreign keys
+* [ ] Relational database design
+
+## Data Manipulation
+
+* [ ] `INSERT`
+* [ ] `UPDATE`
+* [ ] `SELECT`
+* [ ] `WHERE`
+
+## Querying
+
+* [ ] `COUNT()`
+* [ ] `GROUP BY`
+* [ ] `ORDER BY`
+* [ ] aliases
+* [ ] aggregate functions
+* [ ] `JOIN`
+
+## R + SQL
+
+* [ ] Connect R to SQLite
+* [ ] Send SQL queries from R
+* [ ] Retrieve SQL results into R
+* [ ] Transform SQL data using R
+* [ ] Write transformed data back to SQL
+* [ ] Use SQL as the source for an R analysis
+
+---
+
+# Project Decisions Log
+
+Use this section to document decisions that may be important when reproducing the project.
+
+| Date | Decision | Reason |
+| ---- | -------- | ------ |
+|      |          |        |
+|      |          |        |
+|      |          |        |
+
+---
+
+# Problems and Solutions
+
+Document problems encountered during the project.
+
+## Problem 1
+
+**Problem:**
+
+> Describe the problem.
+
+**Solution:**
+
+> Describe how it was solved.
+
+**What I would do next time:**
+
+> Add notes.
+
+---
+
+# Final Reflection
+
+After completing the project, answer the following questions.
+
+### What role did SQL play in this project?
+
+> Add response here.
+
+### What role did R play in this project?
+
+> Add response here.
+
+### Why was the database preferable to continuing to work directly from Excel?
+
+> Add response here.
+
+### Which SQL skills were most useful?
+
+> Add response here.
+
+### Which parts of the workflow could be automated?
+
+> Add response here.
+
+### What would you change if you rebuilt this project?
+
+> Add response here.
+
+### Could you reproduce this workflow for a completely different collection of documents?
+
+> Add response here.
+
+---
+
+# Final Workflow
+
+At the completion of the project, you should be able to explain and reproduce the entire pipeline:
+
+```{mermaid}
+flowchart TD
+    A[Raw Article Catalog] --> B[Import with R]
+    B --> C[Store Metadata in SQL]
+    C --> D[Query URLs with SQL]
+    D --> E[Extract Text with R]
+    E --> F[Update SQL Database]
+    F --> G[Tokenize with R]
+    G --> H[Store Tokens in SQL]
+    H --> I[Explore with SQL]
+    I --> J[Analyze with R]
+    J --> K[Store Results in SQL]
+    K --> L[Report with Quarto]
+```
+
+The goal is not simply to complete one text analysis. The goal is to build a workflow that can be understood, reproduced, modified, and applied to future text-analysis projects.
