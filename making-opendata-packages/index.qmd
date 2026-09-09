@@ -32,14 +32,14 @@ The OpenData ecosystem continues to grow. Currently, the following packages are 
 
 | Package | Coverage |
 |----|----|
-| `nycOpenData` @R-nycOpenData | New York City |
-| `nysOpenData` @R-nysOpenData | New York State |
-| `mtaOpenData` @R-mtaOpenData | Metropolitan Transportation Authority |
-| `laOpenData` @R-laOpenData | Los Angeles |
-| `chiOpenData` @R-chiOpenData | Chicago |
-| `ausOpenData` @R-ausOpenData | Austin |
-| `SeattleOpenData` @R-SeattleOpenData | Seattle |
-| `cincinnatiOpenData` @R-cincinnatiOpenData | Cincinnati |
+| `nycOpenData` [@R-nycOpenData] | New York City |
+| `nysOpenData` [@R-nysOpenData] | New York State |
+| `mtaOpenData` [@R-mtaOpenData] | Metropolitan Transportation Authority |
+| `laOpenData` [@R-laOpenData] | Los Angeles |
+| `chiOpenData` [@R-chiOpenData] | Chicago |
+| `ausOpenData` [@R-ausOpenData] | Austin |
+| `SeattleOpenData` [@R-SeattleOpenData] | Seattle |
+| `cincinnatiOpenData` [@R-cincinnatiOpenData] | Cincinnati |
 
 Together, these packages provide convenient access to tens of billions of rows of publicly available data spanning transportation, public safety, health, education, housing, the environment, and many other domains.
 

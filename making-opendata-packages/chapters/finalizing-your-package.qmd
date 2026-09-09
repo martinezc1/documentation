@@ -109,20 +109,17 @@ For many users, the pkgdown website will be their first interaction with your pa
 To set up a pkgdown website with GitHub Pages, run:
 
 ``` r
+usethis::use_pkgdown()
 usethis::use_pkgdown_github_pages()
 ```
 
-This command is typically run once. It configures pkgdown, prepares GitHub Pages, and creates a GitHub Actions workflow that will automatically build and publish the website when changes are pushed to GitHub.
+These commands are typically run once. They configure pkgdown, prepares GitHub Pages, and creates a GitHub Actions workflow that will automatically build and publish the website when changes are pushed to GitHub.
 
-After running the command, commit and push the newly created files to GitHub.
-
-To preview the pkgdown website locally, run:
+To preview the pkgdown website locally (and make sure everything works/looks good), run:
 
 ``` r
 pkgdown::build_site()
 ```
-
-This builds the website on your computer and allows you to check that the documentation, README, vignettes, and reference pages are displaying correctly before pushing your changes to GitHub.
 
 ::: callout-tip
 #### Preview your website after making changes
@@ -132,6 +129,10 @@ Whenever you update your package documentation, README, or vignettes, you can pr
 ``` r
 pkgdown::build_site()
 ```
+
+After running the commands, commit and push the newly created files to GitHub.
+
+This builds the website on your computer and allows you to check that the documentation, README, vignettes, and reference pages are displaying correctly before pushing your changes to GitHub.
 
 If GitHub Actions is configured through `usethis::use_pkgdown_github_pages()`, you do not need to manually build and upload the website each time. After you commit and push your package changes, GitHub Actions will build and publish the updated pkgdown website.
 :::

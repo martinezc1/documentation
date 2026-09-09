@@ -1,0 +1,60 @@
+---
+title: "CUNY Sports Analytics Research Inititive"
+format: pdf
+editor: visual
+---
+
+# CUNY Sports Analytics Initiative
+
+### Turn your interest in sports and data into real-world experience.
+
+The **Open Data Lab** is building a student-driven sports analytics initiative focused on using data to support CUNY athletics — and we are looking for CUNY students interested in helping us grow it.
+
+## What Do We Do?
+
+Using our growing **CUNY Sports Database**, students work with real collegiate sports data to create analytics, visualizations, and reports that can provide meaningful insights for CUNY coaches, players, and teams.
+
+Our goal is simple:
+
+> **Help CUNY teams be the best they can be with the help of real data.**
+
+Our current work focuses on **CUNY men's basketball**, where we are developing reproducible scouting and performance reports using historical game and player data.
+
+But basketball is only the beginning.
+
+As the initiative grows, students may help:
+
+- Create scouting reports for men's basketball programs across CUNY
+- Analyze team and player performance
+- Build data visualizations for coaches and teams
+- And so much more!
+
+## Who Are We Looking For?
+
+You **do not need to be an expert** in sports analytics or programming to apply.
+
+If you're a CUNY student interested in **sports, data, programming, visualization, research, or simply learning something new, we want to hear from you!**
+
+Students from **all CUNY colleges and academic backgrounds** are encouraged to apply.
+
+I actually like this **better** than the bullets for a one-pager. The bold terms still make it scannable, but it saves a ton of vertical space.
+
+## What Will You Gain?
+
+This is an opportunity to work on a real, growing analytics project while developing experience in:
+
+**Sports Analytics · R · Data Visualization · SQL · Quarto · Git & GitHub · Reproducible Research · Technical Communication**
+
+You'll also have the opportunity to create **real portfolio work** that demonstrates your skills beyond the classroom.
+
+## Interested in Joining?
+
+**Applications are now open to current CUNY students.**
+
+\[**APPLY HERE — QR CODE**\]
+
+Interested in seeing what we're already building?
+
+\[**EXPLORE THE OPEN DATA LAB — QR CODE / WEBSITE**\]
+
+**Come help us build the future of sports analytics at CUNY.**

@@ -1,66 +1,96 @@
-# Choosing a City
+# Choosing an Open Data Portal
 
 ## Introduction
 
-The package template described throughout this guide is designed for cities that use the Socrata Open Data Platform. Because Socrata provides a standardized API across portals, the same package architecture can be reused with only a handful of city-specific modifications.
+Before creating a new `OpenData` R package, you first need to identify an Open Data portal to work with.
 
-This chapter lists major U.S. cities with Socrata-based Open Data portals and provides the two most important values needed when creating a new package:
+The package architecture described throughout this guide is designed primarily for Open Data portals that use the **Socrata Open Data Platform**. Because Socrata provides a standardized API structure across many government portals, much of the package infrastructure can be reused across cities, states, and other government agencies with only small modifications.
 
-- the Socrata portal domain
-- the metadata catalog dataset used by `city_list_datasets()`
+A good place to start is with a community that interests *you*!
+
+This might include:
+
+- your city or county
+- your state
+- a community where you previously lived
+- a government or public agency whose data interests you
+- another community whose Open Data resources you would like to make easier to access from R
+
+The goal of this chapter is to determine whether that community has an Open Data portal that can be adapted to the package architecture used throughout this guide.
+
+## Finding an Open Data Portal
+
+A simple first step is to search the web for your city or state's Open Data portal.
+
+For example, searches such as:
+
+- `Chicago Open Data`
+- `Seattle Open Data`
+- `Connecticut Open Data`
+- `New Orleans Open Data`
+
+will often lead directly to an official government Open Data portal.
+
+You can also explore the [Open Data Network](https://www.opendatanetwork.com/), which provides another way to discover public datasets and Open Data portals from communities across the United States.
 
 ::: callout-tip
-## Using this table
+## Using Open Data Network
 
-Each row contains the two values needed to begin creating a new package.
+If you are unsure where to begin, try searching for the Open Data portal associated with **your own city, county, or state**.
 
-1.  **Portal Domain**
-
-- Used by `.city_endpoint()` in `utils_request.R`.
-- *For example*: https://data.sfgov.org/resource/
-
-2.  **Metadata Dataset**
-
-- Used as the `dataset_id` in `city_list_datasets()`.
-- *For example*: y8fp-fbf5
-
-The complete metadata endpoint would therefore be:
-
-- https://data.sfgov.org/resource/y8fp-fbf5.json
+If you find a dataset that interests you, try searching the page for the term UID. A 4x4 UID, such as `abcd-1234`, is a good indication that the dataset uses Socrata infrastructure.
 :::
 
-| City | Website | API Base Endpoint | Metadata Dataset UID | Metadata JSON Endpoint | Package Status |
-|:-----------|:-----------|:-----------|:-----------|:-----------|:-----------|
-| **New York City, NY** | <https://data.cityofnewyork.us> | `https://data.cityofnewyork.us/resource/` | `5tqd-u88y` | <https://data.cityofnewyork.us/resource/5tqd-u88y.json> | ✅ `nycOpenData` |
-| **New York State, NY** | <https://data.ny.gov> | `https://data.ny.gov/data.json` | Does not follow typical JSON Endpoint structure | <https://data.ny.gov/resource/ca8h-8gjq.json> | ✅ `nysOpenData` |
-| **Chicago, IL** | <https://data.cityofchicago.org> | `https://data.cityofchicago.org/resource/` | `rsxa-ify5` | <https://data.cityofchicago.org/resource/rsxa-ify5.json> | ✅ `chiOpenData` |
-| **Los Angeles, CA** | <https://data.lacity.org> | `https://data.lacity.org/resource/` | `fmt9-hut6` | <https://data.lacity.org/resource/fmt9-hut6.json> | ✅ `laOpenData` |
-| **San Francisco, CA** | <https://data.sfgov.org> | `https://data.sfgov.org/resource/` | `y8fp-fbf5` | <https://data.sfgov.org/resource/y8fp-fbf5.json> | ⬜ Available |
-| **Seattle, WA** | <https://data.seattle.gov> | `https://data.seattle.gov/resource/` | `phjv-68rp` | <https://data.seattle.gov/resource/phjv-68rp.json> | ⬜ Available |
-| **Austin, TX** | <https://data.austintexas.gov> | `https://data.austintexas.gov/resource/` | `my8q-n4hf` | <https://data.austintexas.gov/resource/my8q-n4hf.json> | 🚧 `ausOpenData` (In Progress) |
-| **Dallas, TX** | <https://data.dallascityhall.com> | `https://data.dallascityhall.com/resource/` | `7h2m-4a3j` | <https://data.dallascityhall.com/resource/7h2m-4a3j.json> | ⬜ Available |
-| **New Orleans, LA** | <https://data.nola.gov> | `https://data.nola.gov/resource/` | `dhg4-3vbu` | <https://data.nola.gov/resource/dhg4-3vbu.json> | ⬜ Available |
-| **Detroit, MI** | <https://data.detroitmi.gov> | `https://data.detroitmi.gov/resource/` | `pacb-jr36` | <https://data.detroitmi.gov/resource/pacb-jr36.json> | ⬜ Available |
-| **Cincinnati, OH** | <https://data.cincinnati-oh.gov> | `https://data.cincinnati-oh.gov/resource/` | `a56y-rtyz` | <https://data.cincinnati-oh.gov/resource/a56y-rtyz.json> | ⬜ Available |
+## Is the Portal Powered by Socrata?
 
-::: callout-note
-## Finding additional cities
+Once you have located an Open Data portal, the next step is determining whether it uses Socrata.
 
-New Socrata portals are created and updated over time.
+Socrata datasets commonly use identifiers consisting of two groups of four characters, such as:
 
-If your city is not listed here, search for its Open Data portal and determine whether it is powered by Socrata. If so, identify:
+```text
+erm2-nwe9
+```
 
-- the portal domain
-- the metadata catalog dataset
+These identifiers are commonly referred to as **dataset UIDs** or **4x4 identifiers**.
 
-Those two values are all that is required to begin adapting the package template.
-:::
+Socrata API endpoints generally follow this structure:
+
+```text
+https://PORTAL-DOMAIN/resource/DATASET-UID.json
+```
+
+For example, a dataset with the UID `abcd-1234` might be accessible through:
+
+```text
+https://data.example.gov/resource/abcd-1234.json
+```
+
+Identifying this structure is a strong indication that the portal uses the Socrata API infrastructure expected by the package template.
+
+## Testing the API
+
+Once you have identified a portal domain and dataset UID, you can test whether the dataset is accessible through the Socrata API.
+
+The general endpoint structure is:
+
+```text
+https://PORTAL-DOMAIN/resource/DATASET-UID.json
+```
+
+For example:
+
+```text
+https://data.example.gov/resource/abcd-1234.json
+```
+
+Opening a valid endpoint in your browser should return the dataset as JSON.
 
 ## Before You Begin
 
 Before starting a new package, verify that:
 
-- [ ] The city uses a Socrata-powered Open Data portal.
-- [ ] The metadata catalog dataset is publicly accessible.
-- [ ] Dataset JSON endpoints follow the standard `/resource/<uid>.json` format.
+- [ ] You have identified an official Open Data portal.
+- [ ] The portal uses Socrata infrastructure.
+- [ ] You have identified at least one valid dataset UID.
+- [ ] You can successfully access at least one dataset using the /resource/<uid>.json format.
 - [ ] API requests do not require authentication for the datasets you intend to use.
