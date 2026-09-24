@@ -1,0 +1,297 @@
+---
+title: "Welcome to The Open Data Lab"
+subtitle: "Contributor Onboarding Guide"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    smooth-scroll: true
+    theme: cosmo
+---
+
+# Welcome to the Lab
+
+Welcome! We are excited to have you on the team!
+
+Through your work here at [*The Open Data Lab*](https://nycopendatalab.org), you'll be helping make data more accessible to **anyone who wants to use it, anywhere**.
+
+We believe that open data should be more than simply *available* — it should be **accessible**. The Open Data Lab builds tools, analyses, educational resources, and public-facing projects that make open data easier for people to find, use, understand, and build upon.
+
+This guide is meant to introduce you to the Lab, the projects we're working on, the tools we use, and where you can find everything you need.
+
+::: callout-tip
+## Keep This Guide Handy!
+
+You don't need to memorize everything here.
+
+This guide is meant to be something you can return to whenever you need to find a repository, remember where something lives, or learn more about another part of the Lab.
+:::
+
+# Quick Links
+
+Here are some of the most important places you'll use as a member of the Lab:
+
+- 🌐 [**The Open Data Lab Website**](https://nycopendatalab.org)
+- 💻 [**GitHub Organization**](https://github.com/nyc-open-data-lab)
+- 🏀 [**CUNY Sports Initiative Repository**](https://github.com/nyc-open-data-lab/cuny-sports-lab)
+- 💬 [**Join Our Slack**](https://join.slack.com/t/nycopendatalab/shared_invite/zt-47csdj22t-cVZ8xcGhCS7hfV8Rzt5MJA)
+- 💼 [**LinkedIn**](https://www.linkedin.com/company/the-open-data-lab/)
+
+::: callout-note
+## New to GitHub?
+
+Don't worry if you haven't used GitHub much — or at all.
+
+Part of being involved with the Lab is learning new tools. Nobody is expected to know everything on Day 1.
+:::
+
+# Our Story
+
+The Open Data Lab began with a simple problem: **data can technically be open without being easy to use.**
+
+In 2025, the project that would eventually become the Lab began in a Brooklyn College classroom. Christian Martinez wanted to incorporate NYC Open Data into an R-based course but found that accessing the data programmatically wasn't as straightforward as it could be.
+
+With a little elbow grease and a lot of code, that problem eventually led to the creation of [`nycOpenData`](https://docs.ropensci.org/nycOpenData/), an R package designed to make NYC Open Data easier to discover and access directly from R.
+
+What began with one package has since grown into an ecosystem of open-source projects, public-facing tools, research, and educational initiatives.
+
+Across all of these projects, the basic idea remains the same:
+
+> **Open data should not only be available. It should be accessible and usable.**
+
+# What We Do
+
+The Lab works on several initiatives that approach data accessibility from different angles.
+
+## OpenData Packages
+
+The [`nycOpenData`](https://docs.ropensci.org/nycOpenData/) package began as a way to make NYC Open Data easier to incorporate into R and into the classroom.
+
+The package has since been peer reviewed and accepted by [rOpenSci](https://ropensci.org/blog/2026/08/06/the-journey-of-nycopendata-from-classroom-to-community/).
+
+What started as one package has now grown into an ecosystem of **13 R packages** covering open-data portals across multiple cities, states, and regions.
+
+Together, these projects have made more than **9 billion rows of public data** easier to access programmatically.
+
+Our work doesn't stop at getting the data into R. We also care about documentation, reproducibility, maintainability, and making these tools approachable for people who may be working with open data for the first time.
+
+## NYC 311 Dashboard
+
+Making data accessible to R users is useful — but not everyone uses R.
+
+Using the `nycOpenData` package, the Lab is developing an interactive dashboard that allows anyone to explore NYC 311 data and better understand what is happening in their neighborhood and across New York City.
+
+This project takes the same data infrastructure behind our R packages and turns it into something accessible to a much broader audience.
+
+## CUNY Sports Initiative
+
+The CUNY Sports Initiative began from a similar accessibility problem.
+
+We wanted to create opportunities for students to work with real sports data from their own university. While decades of CUNY athletics statistics are publicly "*available"*, they are spread across individual athletics websites and aren't necessarily structured in a way that makes large-scale analysis easy.
+
+So, we're working to change that.
+
+The initiative is building the data infrastructure necessary to collect, organize, analyze, and share historical CUNY athletics data.
+
+The project repository can be found on [GitHub](https://github.com/nyc-open-data-lab/cuny-sports-lab).
+
+### Data Infrastructure
+
+One of the largest parts of the CUNY Sports Initiative is building the underlying historical data infrastructure.
+
+So far, the Lab has collected historical data for:
+
+- Men's basketball
+- Women's basketball
+
+Our data engineering team is now working to expand this infrastructure to additional sports, including **volleyball**.
+
+Our long-term goal is ambitious: build a structured and accessible historical database of CUNY athletics data across sports.
+
+Everything else we build depends on this foundation.
+
+### Scouting Reports
+
+There are relatively few analytical resources dedicated specifically to CUNY athletics.
+
+Because we're building the underlying data infrastructure, we have an opportunity to change that.
+
+The Lab is developing scouting reports that use historical and recent performance data to help better understand teams and players.
+
+These reports could be used to:
+
+- Prepare for an upcoming season
+- Evaluate an opponent
+- Understand team strengths and weaknesses
+- Explore player performance
+- Identify trends that may not be immediately obvious from traditional statistics
+
+### Historical Analysis
+
+Our basketball data stretches back into the 2000s, giving us an opportunity to explore the history of CUNY athletics quantitatively.
+
+Rather than simply collecting historical statistics, we want to ask what stories the data can tell us.
+
+For example:
+
+- **Which CUNY program has won the most games?**
+- **Who is CUNY's all-time leading scorer?**
+- **Which teams have had the most dominant seasons?**
+- **How has CUNY basketball changed over time?**
+- **Which players or teams stand out historically?**
+
+As our database expands to additional sports, the number of questions we can explore will expand with it.
+
+### Analytics Dashboard
+
+Collecting the data is only the first step.
+
+A major goal of the initiative is to turn the data we've collected into a public-facing analytics dashboard that anyone can explore — without needing a programming language.
+
+The dashboard will make historical men's and women's basketball data easier for students, athletes, coaches, researchers, journalists, and fans to explore.
+
+### Where We're Going
+
+There are plenty of directions this initiative could eventually go.
+
+Some ideas currently being explored include:
+
+- Expanding the historical database to additional CUNY sports
+- Building a `cunySports` R package
+- Creating end-of-season **CUNY Sports Wrapped** experiences
+- Expanding scouting and analytical reports
+- Developing additional public-facing visualizations
+- Supporting sports journalism and storytelling using CUNY athletics data
+
+And there will almost certainly be ideas we haven't thought of yet.
+
+# Meet the Lab
+
+The Open Data Lab is collaborative by design.
+
+Contributors work across different projects and bring different backgrounds, interests, and technical skills to the Lab.
+
+You can see current contributors and learn more about their work on the [Open Data Lab website](https://nycopendatalab.org).
+
+As you get started, you'll also learn who is working on projects related to yours. Don't be afraid to reach out to another Lab member if they have experience with something you're working on.
+
+# How We Work
+
+There isn't one single workflow that applies perfectly to every Lab project. Someone developing an R package may work differently from someone building a dashboard or conducting a historical analysis.
+
+However, there are a few principles that apply across the Lab.
+
+## GitHub
+
+[GitHub](https://github.com/nyc-open-data-lab) is the primary home for our code and technical projects.
+
+Depending on your role, you may use GitHub to:
+
+- Access project repositories
+- Work with code
+- Track changes
+- Contribute documentation
+- Collaborate with other Lab members
+- Share your work
+
+If you're new to Git or GitHub, that's completely okay. You are **not expected to arrive knowing every tool we use**.
+
+## Slack
+
+Slack is our primary space for day-to-day Lab communication.
+
+Use Slack to ask questions, share updates, communicate with collaborators, and let us know when you've run into something.
+
+**Please ask questions.**
+
+Getting stuck is a normal part of working with data and code. We'd much rather you ask for help than spend hours stuck on something because you think you're supposed to figure everything out alone.
+
+## Reproducibility
+
+Whenever possible, our work should be **reproducible**.
+
+Someone else should be able to understand what you did, where the data came from, and how you got from the original data to the final result.
+
+That means things like:
+
+- Keeping code organized
+- Documenting important decisions
+- Using clear file and variable names
+- Avoiding unnecessary manual steps
+- Keeping project repositories organized
+- Leaving enough information that another contributor could continue your work
+
+Think about the person who may inherit your project six months from now — which may even be future you!
+
+## Experimentation Is Encouraged
+
+Not everything we try is going to work.
+
+That's okay. Sometimes, things may even break.
+
+::: callout-note
+## As my father always says:
+
+That's why they put erasers on pencils.
+:::
+
+This is a Lab.
+
+Experiment with things. Ask questions. Try a different approach. Pitch an analysis. Build a prototype. Suggest a visualization. Tell us when you think something could be better.
+
+Some ideas will work, some won't, and some may turn into entirely new Lab initiatives.
+
+# Getting Started
+
+Your exact onboarding will depend on the project you're joining, but everyone should become familiar with the basic Lab ecosystem.
+
+During your first week, try to:
+
+- [ ] Join the Lab's Slack
+- [ ] Visit the Lab's GitHub organization
+- [ ] Find the repository associated with your project
+- [ ] Read your project's README and existing documentation
+- [ ] Make sure you have access to the resources you need
+- [ ] Learn who else is working on your project
+- [ ] Understand what your project is trying to accomplish
+- [ ] Identify your first task or milestone
+
+::: callout-tip
+## You Don't Need to Understand Everything Yet
+
+The Lab has projects involving R packages, databases, dashboards, web scraping, data visualization, reproducible research, sports analytics, and more.
+
+You **do not** need to understand all of them.
+
+Start with your project. You'll naturally learn more about the rest of the Lab as you go.
+:::
+
+# Make It Yours
+
+One of the most important things to know about working with the Open Data Lab is that **you are encouraged to contribute ideas, not just complete assigned tasks**.
+
+If you see something that could be better, say something.
+
+If you have an idea for an analysis, visualization, package, dashboard, story, research question, or entirely new project, bring it up.
+
+The Lab has grown by following interesting problems and asking:
+
+> *Could we make this more accessible?*
+
+Some of the best things we build in the future may come from ideas that our contributors bring with them.
+
+# Getting Help
+
+You are never expected to figure everything out by yourself.
+
+If you're stuck, have a question, need access to something, aren't sure what to work on next, or just want to talk through an idea, reach out.
+
+You can ask in our [Slack](https://join.slack.com/t/nycopendatalab/shared_invite/zt-47csdj22t-cVZ8xcGhCS7hfV8Rzt5MJA) or contact Christian directly at [c.martinez0\@outlook.com](mailto:c.martinez0@outlook.com).
+
+And remember: **asking questions is part of the work.**
+
+# Welcome Aboard!
+
+We're excited to see what you build.
+
+Welcome to **The Open Data Lab**.
